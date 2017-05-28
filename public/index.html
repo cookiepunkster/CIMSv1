@@ -1,0 +1,373 @@
+<html ng-app="MainApp">
+
+<head>
+    <base href="/">
+
+    <title> CIMS </title>
+
+    <!-- JS FILES -->
+    <script src="libs/angular/angular.min.js"></script>
+    <script src="libs/angular-route/angular-route.min.js"></script>
+    <script src="libs/jquery/dist/jquery.min.js"></script>
+    <script src="libs/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="libs/pdfmake/build/pdfmake.min.js"></script>
+    <script src="libs/pdfmake/build/vfs_fonts.js"></script>
+
+    <!-- CUSTOM ANGULAR JS FILES -->
+    <script src="js/controllers/DiseaseMngtCtrl.js"></script>
+    <script src="js/controllers/MedicineMngtCtrl.js"></script>
+    <script src="js/controllers/NavigationMngtCtrl.js"></script>
+    <script src="js/controllers/PatientMngtCtrl.js"></script>
+    <script src="js/controllers/AccountMngtCtrl.js"></script>
+    <script src="js/controllers/PatientSearchCtrl.js"></script>
+    <script src="js/controllers/UserCtrl.js"></script>
+
+    <script src="js/services/DiseasesServices.js"></script>
+    <script src="js/services/GenerationServices.js"></script>
+    <script src="js/services/MedicinesServices.js"></script>
+    <script src="js/services/PatientsServices.js"></script>
+    <script src="js/services/UsersServices.js"></script>
+    <script src="js/services/AbstractsServices.js"></script>
+    <script src="js/services/ConsultationsServices.js"></script>
+    <script src="js/services/PrescriptionsServices.js"></script>
+
+    <script src="js/MainAppRoutes.js"></script>
+    <script src="js/MainApp.js"></script>
+
+    <!-- CSS FILES -->
+    <link rel="stylesheet" href="libs/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body id="body" ng-controller="UserController">
+
+    <!-- NAV CODE -->
+
+    <!-- md and lg -->
+
+    <nav class="navbar navbar-inverse navbar-static-top" role="navigation" ng-init="initializeUser()">
+    <div class="container-fluid">
+
+        <!-- App Name -->
+        <div class="navbar-header">
+            <a href="/navigator" class="navbar-brand" ng-click="check()">CIMS</a>
+        </div>
+
+        <!-- User drop down -->
+        <ul class="nav navbar-nav navbar-right" ng-show="loggedIn">
+            <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                {{loggedInUser.username}}
+            <span class="caret"></span></a>
+
+            <!-- drow down options -->
+            <ul class="dropdown-menu" ng-show="loggedInUser != {}">
+                <li><a href="#" ng-click="_toggleUpdate()" data-toggle="modal" data-target="#registerModal">My Account</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="#" ng-click="logout()">Logout</a></li>
+            </ul>
+            </li>
+        </ul>
+
+
+    </div>
+    </nav>
+    
+    <!-- NAV HEADER CODE -->
+
+    <main ng-view>
+
+    </main>
+
+    <!-- modal for registering -->
+    <div class="modal fade" id="registerModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h4 class="modal-title">User</h4>
+        </div>
+
+        <!-- main form -->
+        <div class="modal-body">
+        <form role="form" name="userForm" ng-submit="">
+        
+            <div class="row">
+
+            <!-- first name -->
+            <div class="col-lg-4">
+            <label for=firstName>First name:</label>
+            <div class="form-group">
+                <input type="text" class="form-control" id="firstName" ng-required="true" ng-minlength="3" ng-model="user.firstName"/>
+            </div>
+            </div>
+
+            <!-- last name -->
+            <div class="col-lg-4">
+            <label for="lastName">Last name:</label>
+            <div class="form-group">
+                <input type="text" class="form-control" id="lastName" ng-required="true" ng-minlength="3" ng-model="user.lastName"/>
+            </div>
+            </div>
+
+            <!-- middle name -->
+            <div class="col-lg-4">
+            <label for="middleName">Middle name:</label>
+            <div class="form-group">
+                <input type="text" class="form-control" id="middleName" ng-required="true" ng-minlength="3" ng-model="user.middleName"/>
+            </div>
+            </div>
+
+            </div> <!-- row for names -->
+
+
+            <div class="row">
+            
+            <!-- sex -->
+            <div class="col-lg-3">
+                <label>Sex:</label>
+
+                <label class="checkbox-inline">
+                    <input type="checkbox" value="F" ng-model="user.sex.F">F
+                </label>
+                <label class="checkbox-inline">
+                    <input type="checkbox" value="M" ng-model="user.sex.M">M
+                </label>
+            </div>
+
+            <!-- type -->
+            <div class="col-lg-4">
+                <label>Type:</label>
+
+                <label class="checkbox-inline">
+                    <input type="checkbox" value="Doctor" ng-model="user.type.Doctor"/>Doctor
+                </label>
+                <label class="checkbox-inline">
+                    <input type="checkbox" value="Secretary" ng-model="user.type.Secretary"/>Secretary
+                </label>
+            </div>
+
+            </div> <!-- row for sex and type -->
+
+
+            <div class="row" ng-show="user.type.Doctor">
+
+                <!-- ptr -->
+                <div class="col-lg-4">
+                <label for="ptr">PTR:</label>
+                <div class="form-group">
+                    <input type="number" class="form-control" id="ptr" ng-maxlength="7" ng-model="user.ptr"/>
+                </div>
+                <p class="help-block">*7 numbers max</p>
+
+                <label>Addresses:</label>
+                </div>
+
+                <!-- license -->
+                <div class="col-lg-4">
+                <label for="license">License:</label>
+                <div class="form-group">
+                    <input type="number" class="form-control" id="license" ng-maxlength="5" ng-model="user.license"/>
+                </div>
+
+                <p class="help-block">*5 numbers max</p>
+                </div>
+
+            </div> <!-- ptr and license -->
+
+
+            <!-- printing the addresses -->
+            <div class="row" ng-show="user.type.Doctor" ng-repeat="address in arrAddresses">
+
+                <!-- room number -->
+                <div class="col-lg-2">
+                <div class="form-group">
+                    <input type="text" class="form-control" ng-disabled="true" ng-model="address.roomNumber"/>
+                </div> 
+                </div>
+
+                <!-- main address -->
+                <div class="col-lg-3">
+                <div class="form-group">
+                    <input type="text" class="form-control" ng-disabled="true" ng-model="address.mainAddress"/>
+                </div>
+                </div>
+
+                <!-- time slots -->
+                <div class="col-lg-3">
+                <div class="form-group" ng-repeat="timeslot in address.timeSlots">
+                <div class="input-group">
+                    <input type="text" class="form-control" ng-disabled="true" ng-model="timeslot"/>
+                </div>
+                </div>
+                </div>
+
+                <!-- contact number -->
+                <div class="col-lg-3">
+                <div class="form-group">
+                    <input type="number" class="form-control" ng-disabled="true" ng-model="address.contactNumber"/>
+                </div>
+                </div>
+
+                <!-- the little minus button -->
+                <div class="col-lg-1">
+                <div class="form-group">
+                    <button type="button" class="btn btn-default btn-block" ng-click="spliceAddress(address)">
+                        <span class="glyphicon glyphicon-minus"></span>
+                    </button>
+                </div>
+                </div>
+            
+                <hr/>
+
+            </div> <!-- addresses printing -->
+            
+
+            <div class="row" ng-show="user.type.Doctor">
+
+                <!-- room number -->
+                <div class="col-lg-2">
+                <label for="roomNumber">Room number:</label>
+                <div class="form-group">
+                    <input type="text" class="form-control" id="roomNumber" ng-model="address.roomNumber"/>
+                </div> 
+                </div>
+
+                <!-- main address -->
+                <div class="col-lg-3">
+                <label for="mainAddress">Main address:</label>
+                <div class="form-group">
+                    <input type="text" class="form-control" id="mainAddress" ng-model="address.mainAddress"/>
+                </div>
+                </div>
+
+                <!-- time slots -->
+                <div class="col-lg-3">
+                <label for="timeSlots">Time slots:</label>
+
+                <!-- printing time slots -->
+                <div class="form-group" ng-repeat="timeslot in arrTimeSlots">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="timeSlots" ng-model="timeslot"/>
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-primary" ng-click="spliceTimeSlot(timeslot)"/>
+                            Del
+                        </button>
+                    </span>
+                </div>
+                </div>
+
+
+                <!-- adding time slots -->
+                <div class="form-group">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="timeSlots" ng-model="strTimeSlot"/>
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-primary" ng-disabled="!strTimeSlot" ng-click="pushTimeSlot()"/>
+                            Add
+                        </button>
+                    </span>
+                </div>
+                </div>
+                </div>
+
+                <!-- contact number -->
+                <div class="col-lg-3">
+                <label for="contactNumber">Contact #:</label>
+                <div class="form-group">
+                    <input type="number" class="form-control" id="contactNumber" ng-model="address.contactNumber"/>
+                </div>
+                </div>
+
+                <!-- the little add button -->
+                <div class="col-lg-1">
+                <label>Action</label>
+                <div class="form-group">
+                    <button type="button" class="btn btn-default btn-block" ng-disabled="!address.roomNumber || !address.mainAddress || !address.contactNumber || arrTimeSlots.length == 0" ng-click="pushAddress()">
+                        <span class="glyphicon glyphicon-plus"></span>
+                    </button>
+                </div>
+                </div>
+
+            </div> <!-- addresses inputting -->
+
+            
+            <div class="row">
+
+                <!-- username -->
+                <div class="col-lg-4">
+                <label for="username">Username:</label>
+                <div class="form-group">
+                    <input type="text" class="form-control" id="username" ng-required="true" ng-minlength="3" ng-model="user.username"/>
+                </div>
+                </div>
+
+                <!-- passwords -->
+                <div class="col-lg-4">
+                <div class="form-group">
+                    <label for="password1">Password:</label>
+                    <input type="text" class="form-control" id="password1" ng-required="true" ng-minlength="3" ng-model="user.password1"/>
+                </div>
+
+                <div class="form-group">
+                    <label for="password2">Re-type password:</label>
+                    <input type="text" class="form-control" id="password2" ng-required="true" ng-minlength="3" ng-model="user.password2"/>
+                </div>
+                </div>
+
+                <!-- warning on passswords -->
+                <div class="col-lg-4">
+                <div class="alert alert-warning alert-dismissible" role="alert" ng-show="bPasswordNotMatching">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <strong>Warning!</strong> your passwords do not match.
+                </div>
+                </div>
+
+            </div> <!-- username and passwords -->
+
+        </div>
+
+        <div class="modal-footer">
+            <div class="row">
+            
+            <div class="col-lg-8">
+            </div>
+
+            <!-- delete button -->
+            <div class="col-lg-2">
+                <button type="button" class="btn btn-danger btn-block" data-toggle="collapse" data-target="#deletePicker">DELETE</button>
+
+                <div class="collapse" id="deletePicker">
+                    <br/>
+                    <button type="button" class="btn btn-danger btn-block" ng-click="_deleteUser()">YES</button>
+                    <button type="button" class="btn btn-default btn-block" data-toggle="collapse" data-target="#deletePicker">NO</button>
+                </div>
+
+            </div>
+
+            <!-- save button -->
+            <div class="col-lg-2">
+                <button type="submit" class="btn btn-primary btn-block" ng-click="_saveUser();" ng-disabled="userForm.$invalid">SAVE</button>
+            </div>
+
+        </form>
+
+            </div>
+        </div>
+    </div>
+    </div>
+    </div>
+
+</body>
+
+    <script>
+
+    $('#registerModal').on('hidden.bs.modal', function () {
+       angular.element(document.getElementById('body')).scope()._resetBools();
+    });
+
+    </script>
+
+</html>

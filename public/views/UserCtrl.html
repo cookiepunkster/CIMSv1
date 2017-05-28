@@ -1,0 +1,351 @@
+<div class="container-fluid">
+
+<!-- panel for input boxes -->
+<div class="panel panel-default col-lg-4 col-lg-push-4">
+<div class="panel-body">
+
+    <!-- form for sign in inputs -->
+    <form role="form" name="signInForm" ng-submit="signIn(signInInfo)">
+
+        <!-- input for username -->
+        <div class="form-group">
+        <div class="input-group">
+            <span class="input-group-addon" aria-hidden="true"><i class="glyphicon glyphicon-user"></i></span>
+            <input type="text" id="username" class="form-control" placeholder="Username" ng-minlength="3" ng-required="true" ng-model="signInInfo.username"/>
+        </div>
+        </div>
+
+        <!-- input for password -->
+        <div class="form-group">
+        <div class="input-group">
+            <span class="input-group-addon" aria-hidden="true"><i class="glyphicon glyphicon-briefcase"></i></span>
+            <input type="password" id="password" class="form-control" placeholder="Password" ng-minlength="3" ng-required="true" ng-model="signInInfo.password"/>
+        </div> 
+        </div>
+
+        <!-- error catching in no user -->
+        <div class="alert alert-warning alert-danger fade in" role="alert" ng-show="bNoUser">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close" ng-click="toggleErrorNoUser()">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            No user of that username or password is found.
+        </div>
+
+        <!-- submit button -->
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary btn-block" ng-disabled="signInForm.$invalid">Sign In</button>
+        </div>
+
+        <!-- register link to modal -->
+        <div class="help-block">
+            <a class="pull-right text-muted" href="#" id="signUp" data-toggle="modal" data-target="#registerModal" ng-click="_toggleAdding()"><small>Do not have an account? Sign up!</small></a>
+        </div>
+
+    </form>
+    <!-- end form for sign in inputs -->
+
+</div>
+</div>
+<!-- end panel for input boxes --<
+
+
+<!-- modal for signing up -->
+<div class="modal fade" id="signUpPopUp" tabindex="-1" role="dialog">
+
+<div class="modal-dialog" role="document">
+
+    <div class="modal-content">
+    
+    <!-- header -->
+    <div class="modal-header">
+        <h4 class="modal-title">Register</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    </div> <!-- end header -->
+
+    <form role="form" name="signUpForm" ng-submit="signUp(signUpInfo)">
+        <!-- body -->
+        <div class="modal-body">
+
+            <!-- row of first name and last name -->
+            <div class="row">
+
+            <!-- input for first name -->
+            <div class="col-lg-6">
+            <div class="form-group">
+                <label for="firstName">First Name:</label>
+                <input type="text" class="form-control" id="firstName" ng-required="true" ng-model="signUpInfo.firstName"/>
+            </div>
+            </div> <!-- end first name -->
+
+            <!-- input for last name -->
+            <div class="col-lg-6">
+            <div class="form-group">
+                <label for="lastName">Last Name:</label>
+                <input type="text" class="form-control" id="lastName" ng-required="true" ng-model="signUpInfo.lastName"/>
+            </div>
+            </div> <!-- end last name -->
+
+            </div> <!-- end row for first and last name -->
+
+
+            <!-- row for middle name -->
+            <div class="row">
+            <div class="col-lg-7">
+                <div class="form-group">
+                <label for="middleName">Middle Name:</label>
+                <input type="text" class="form-control" id="middleName" ng-required="true" ng-model="signUpInfo.middleName"/>
+                </div>
+            </div>
+            </div> <!-- end row for middle name -->
+
+
+            <!-- row for sex -->
+            <div class="row">
+            <div class="col-lg-6">
+            <div class="form-group">
+                <label>Sex:  </label>
+                <label class="checkbox-inline">
+                    <input type="checkbox" name="sex" value="F" ng-model="signUpInfo.sex.F"/>F
+                </label>
+                <label class="checkbox-inline">
+                    <input type="checkbox" name="sex" value="M" ng-model="signUpInfo.sex.M"/>M
+                </label>
+            </div>
+            </div>
+            </div> <!-- end row for sex -->
+
+            
+            <!-- row for role -->
+            <div class="row">
+            <div class="col-lg-6">
+            <div class="form-group">
+                <label>Type:</label>
+                <label class="checkbox-inline">
+                    <input type="checkbox" name="type" value="Doctor" ng-model="signUpInfo.type.Doctor"/>Doctor
+                </label>
+                <label class="checkbox-inline">
+                    <input type="checkbox" name="type" value="Secretary" ng-model="signUpInfo.type.Secretary"/>Secretary
+                </label>
+            </div>
+            </div>
+            </div> <!-- end row for role -->
+
+
+
+            <!-- row for special doctor's info -->
+            <div ng-show="signUpInfo.type.Doctor">
+
+            <!-- PTR -->
+            <div class="row">
+                <div class="col-lg-7">
+                <label for="ptr">PTR:</label>
+                <div class="form-group">
+                    <input type="text" class="form-control" id="ptr"/>
+                </div>
+                </div>
+            </div>
+
+            <!-- row for room number and address -->
+            <label>Addresses: </label>
+
+
+            <!-- printing pre-existing addresses -->
+            <div ng-repeat="address in arrAddresses">
+
+            <div class="row">
+
+                <!-- room number column -->
+                <div class="col-lg-4">
+                <div class="form-group">
+                    <label for="roomNumber">Room #: </label>
+                    <input type="text" class="form-control" id="roomNumber" ng-disabled="true" ng-model="address.roomNumber"/>
+                </div>
+                </div>
+
+                <!-- address column -->
+                <div class="col-lg-8">
+                <div class="form-group">
+                    <label for="address">Main address:</label>
+                    <input type="text" class="form-control" id="address" ng-disabled="true" ng-model="address.mainAddress"/>
+                </div>
+                </div>
+
+            </div>
+
+            <!-- row for time slots and contact number -->
+            <div class="row">
+
+                <!-- time slots column -->
+                <div class="col-lg-6">
+
+                <label for="timeSlots">Time slots: </label>
+
+                <!-- displaying of time slots -->
+                <div class="form-group" ng-repeat="slot in address.timeSlots">
+                <div class="input-group">
+                    <input type="text" class="form-control" ng-disabled="true" ng-model="slot"/>
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default" ng-disabled="true" ng-click="spliceTimeSlot(slot)">Del</button>
+                    </span>
+                </div>
+                </div>
+
+                <!-- for addition of time slots -->
+                <div class="form-group">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="timeSlots" ng-disabled="true"/>
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default" ng-disabled="true">Add</button>
+                    </span>
+                </div>
+                </div> <!-- addition of time slots -->
+
+                </div>
+
+                <!-- contact number column -->
+                <div class="col-lg-6">
+                <div class="form-group">
+                    <label for="contactNumber">Contact #:</label>
+                    <input type="text" class="form-control" id="contactNumber" ng-disabled="true" ng-model="address.contactNumber"/>
+                </div>
+                </div>
+
+            </div>
+                
+            <!-- row for add address button -->
+            <div class="row">
+
+                <div class="col-lg-4 col-lg-push-8">
+                    <button type="button" class="btn btn-default btn-block" ng-click="spliceAddress(address)">Remove address</button>
+                </div>
+
+            </div> 
+
+                <hr/>
+
+            </div>
+
+            <!-- input addresses -->
+            <div class="row">
+
+                <!-- room number column -->
+                <div class="col-lg-4">
+                <div class="form-group">
+                    <label for="roomNumber">Room #: </label>
+                    <input type="text" class="form-control" id="roomNumber" ng-model="signUpInfo.address.roomNumber"/>
+                </div>
+                </div>
+
+                <!-- address column -->
+                <div class="col-lg-8">
+                <div class="form-group">
+                    <label for="address">Main address:</label>
+                    <input type="text" class="form-control" id="address" ng-model="signUpInfo.address.mainAddress"/>
+                </div>
+                </div>
+
+            </div>
+
+            <!-- row for time slots and contact number -->
+            <div class="row">
+
+                <!-- time slots column -->
+                <div class="col-lg-6">
+
+                <label for="timeSlots">Time slots: </label>
+
+                <!-- displaying of time slots -->
+                <div class="form-group" ng-repeat="slot in arrContactNumbers">
+                <div class="input-group">
+                    <input type="text" class="form-control" ng-model="slot"/>
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default" ng-click="spliceTimeSlot(slot)">Del</button>
+                    </span>
+                </div>
+                </div>
+
+                <!-- for addition of time slots -->
+                <div class="form-group">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="timeSlots" ng-model="strTimeSlot"/>
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default" ng-click="pushTimeSlot(strTimeSlot)">Add</button>
+                    </span>
+                </div>
+                </div> <!-- addition of time slots -->
+
+                </div>
+
+                <!-- contact number column -->
+                <div class="col-lg-6">
+                <div class="form-group">
+                    <label for="contactNumber">Contact #:</label>
+                    <input type="text" class="form-control" id="contactNumber" ng-model="signUpInfo.address.contactNumber"/>
+                </div>
+                </div>
+
+            </div>
+
+            <!-- row for add address button -->
+            <div class="row">
+
+                <div class="col-lg-4 col-lg-push-8">
+                    <button type="button" class="btn btn-default btn-block" ng-disabled="!signUpInfo.address.roomNumber || !signUpInfo.address.contactNumber || !signUpInfo.address.mainAddress || arrContactNumbers.length == 0" ng-click="pushAddress(signUpInfo.address)">Add address</button>
+                </div>
+
+            </div> 
+
+            </div>
+
+            <br/>
+
+            <!-- username field -->
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" class="form-control" id="username" ng-required="true" ng-model="signUpInfo.username"/>
+            </div> <!-- end username -->
+
+
+            <!-- password field -->
+            <div class="form-group">
+                <label for="password1">Password:</label>
+                <input type="password" class="form-control" id="password1" ng-required="true" ng-model="signUpInfo.password1"/>
+            </div>
+
+            <div class="form-group">
+                <label for="password2">Re-type password:</label>
+                <input type="password" class="form-control" id="password2" ng-required="true" ng-model="signUpInfo.password2"/>
+            </div> <!-- end password field -->
+
+            <!-- error handling for passwords -->
+            <div class="alert alert-danger alert-dismissible fade in" role="alert" ng-show="bPasswordNotMatching">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close" ng-click="togglePasswordError()">&times;</button>
+                Your passwords do not match.
+            </div>
+
+            <!-- sign-up error -->
+            <div class="alert alert-danger alert-dismissible fade in" role="alert" ng-show="bErrorInSigningUp">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close" ng-click="toggleSigningUpError()">&times;</button>
+                There is a problem in registering.
+            </div>
+
+        </div> <!-- end body -->
+
+        <!-- footer -->
+        <div class="modal-footer">
+
+            <!-- submit button -->
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary btn-block" ng-disabled="signUpForm.$invalid">Register</button>
+            </div>
+
+        </div> <!-- end footer -->
+    </form>
+
+    </div>
+
+</div>
+
+</div> <!-- end modal for signing up -->
+
+</div> <!-- end container -->

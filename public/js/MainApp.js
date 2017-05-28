@@ -1,0 +1,1 @@
+angular.module('MainApp', ['ngRoute', 'MainAppRoutes', 'UserCtrl', 'DiseaseMngtCtrl', 'MedicineMngtCtrl', 'NavigationMngtCtrl', 'PatientMngtCtrl', 'AccountMngtCtrl', 'PatientSearchCtrl', 'UsersServices', 'DiseasesServices', 'GenerationServices', 'MedicinesServices', 'PatientsServices', 'AbstractsServices', 'ConsultationsServices', 'PrescriptionsServices']);

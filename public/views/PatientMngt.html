@@ -1,0 +1,680 @@
+<div class="container-fluid" ng-init="initializeData()">
+
+<div class="col-lg-1">
+
+</div>
+
+<!-- left side bar -->
+<div class="col-lg-1">
+
+    <div class="row">
+        
+    <br/>
+    <button class="btn btn-default btn-block pull-right" ng-click="pathToPatientSearch()">
+        <span class="glyphicon glyphicon-chevron-left"></span>
+        All Patients
+    </button>
+
+    </div>
+
+    <div class="row">
+          
+    </div>
+
+    <!-- links to further document generation -->
+    <!--
+    <div class="row">
+    <button type="button" class="btn btn-default btn-block pull-right" data-toggle="collapse" data-target="#formLinks">Generate forms</button>
+    <div class="collapse" id="formLinks">
+        <a data-toggle="modal" data-target="#generateRequestForm">Request Form</a> <br/>
+        <a data-toggle="modal" data-target="#generateReferralForm">Referral Form</a> <br/>
+        <a>Patient Information</a> <br/>
+    </div>
+    -->
+
+
+</div> <!-- end left side bar -->
+
+
+<!-- main content -->
+<div class="col-lg-8">
+
+    
+
+    <!-- demographics -->
+    <div>
+        <h3>{{ patient.lastName }}, {{ patient.firstName }} {{ patient.middleName }} ({{ patient.sex }})</h3>
+        <h5>{{ fixDateWithNamedMonth(patient.birthdate) }} / {{ fixAge(patient.birthdate) }} Y.O.</h5>
+        <h5>{{ patient.contactNumber }}</h5>
+        <h5>{{ patient.address }}</h5>
+        <h5><a href="#!" ng-click="generatePatientInformation()"><i>Generate patient information</i></a></h5>
+        <h5><a href="#!" data-toggle="modal" data-target="#generateRequestForm"><i>Generate request form</i></a></h5>
+    </div> <!-- end demographics -->
+
+    <hr/>
+
+    <!-- accordion -->
+    <div class="panel-group" id="patientMngtAccordion" role="tablist">
+
+        
+    <!-- consultation -->
+    <div class="panel panel-default">
+        <div class="panel-heading" id="consultationHeading" role="tab">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#patientMngtAccordion" href="#consultationCollapse">
+                    Consultation History
+                </a>
+            </h4>
+        </div>
+
+    <!-- collapse part -->
+    <div class="panel-collapse collapse" id="consultationCollapse" role="tabpanel">
+    <div class="panel-body">
+
+
+    <div class="panel-group" id="consultationForm">
+        <div class="panel">
+            <button class="btn btn-primary" data-parent="#consultationForm" data-toggle="collapse" href="#consultationFormProper" ng-click="addConsultation()">
+                New Consultation
+            </button>
+            <div class="panel-collapse collapse" id="consultationFormProper">
+                <div class="panel-body">
+                <!-- consultation inputs -->
+                <br/>
+                <div class="row" ng-repeat="diagnosis in consultation.diagnosesWithData">
+                <div class="col-lg-6">
+                    <div class="form-group">
+                        <input class="form-control" value="{{ diagnosis.name }}" ng-model="diagnosis.name" ng-readonly="true"/>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <textarea class="form-control" ng-model="diagnosis.description" ng-readonly="true"></textarea>
+                    </div>
+                </div>
+
+                <div class="col-lg-2">
+                    <button class="btn btn-default" ng-click="spliceDiagnosis(diagnosis)">
+                        <span class="glyphicon glyphicon-remove"></span>
+                    </button>
+                </div>
+                </div>
+
+                <div class="row">
+                <div class="col-lg-6">
+                    <div class="form-group">
+                        <input class="form-control" placeholder="Search" ng-model="query.name" ng-focus="focus=true"/>
+                    </div>
+                    <div id="search-results" ng-show="focus">
+                        <div class="search-result" ng-repeat="disease in allDiseases | searchDiseases:query.name" ng-click="setQuery(disease)">
+                            {{ disease.name }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <textarea class="form-control" placeholder="Description" ng-model="object.description" ng-readonly="true">
+                        </textarea>
+                    </div>
+                </div>
+
+                <div class="col-lg-2">
+                    <button class="btn btn-default" ng-click="pushDiagnosis()">
+                        <span class="glyphicon glyphicon-plus"></span>
+                    </button>
+                </div>
+                </div>
+                
+                <!-- buttons collection -->
+                <div class="row">
+                    
+                    <!-- extra space -->
+                    <div class="col-lg-6">
+
+                    </div>
+
+                    <!-- update -->
+                    <div class="col-lg-2">  
+                        <button class="btn btn-default btn-block" data-toggle="collapse" data-target="#consultationFormProper" ng-click="update()" ng-show="consultation._id != ''">Save</button>
+                    </div> 
+
+                    <!-- save -->
+                    <div class="col-lg-2">
+                        <button class="btn btn-default btn-block" data-toggle="collapse" data-target="#consultationFormProper" ng-click="save()" ng-disabled="consultation.diagnosesWithData.length == 0">Save as new</button>
+                    </div>
+
+                    <!-- generate -->
+                    <div class="col-lg-2">
+                        <button class="btn btn-default btn-block" data-toggle="collapse" data-target="#setOfButtons">Generate</button>
+                        
+                        <br/>
+                        <div class="collapse" id="setOfButtons">
+                            <button class="btn btn-default btn-block" data-toggle="modal" data-target="#generateReferralForm" ng-click="initializeReferralForm()">Referral</button>
+                            <button class="btn btn-default btn-block" data-toggle="modal" data-target="#generateCertificate" ng-click="initializeCertificateForm()">Certificate</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            </div>
+        </div>
+    </div>
+
+    </div>
+
+    <!-- table of values -->
+    <table class="table" ng-show="allConsultationsForPatient.length > 0">
+    <thead>
+
+    <tr>
+        <th>Date</th>
+        <th>Diagnoses</th>
+        <th>Action</th>
+    </tr>
+
+    </thead>
+    <tbody>
+    
+    <!-- repeating rows of data -->
+    <tr ng-repeat="consultation in allConsultationsForPatient">
+        <td ng-init="fixDate(consultation)">
+            {{ consultation.fixedDate }}
+        </td>
+        <td>
+            <ul>
+                <li ng-repeat="diagnosis in consultation.diagnosesWithData">
+                    {{ diagnosis.name }}
+                </li>
+            </ul>
+        </td>
+        <td>
+            <!-- edit button -->
+            <button class="btn btn-primary" data-toggle="collapse" data-target="#consultationFormProper" ng-click="editConsultation(consultation)">
+                <span class="glyphicon glyphicon-pencil"></span>
+            </button>
+
+            <!-- delete button that will show the modal -->
+            <button class="btn btn-primary" data-toggle="modal" data-target=".confirmation-modal-sm" ng-click="setDeleteKeyAndFactorForConsultation(consultation._id)">
+                <span class="glyphicon glyphicon-remove"></span>
+            </button>
+        </td>
+    </tr>
+
+    </tbody>
+    </table>
+
+    </div>
+    </div> <!-- consultation -->
+
+
+    <!-- prescription -->
+    <div class="panel panel-default">
+        <div class="panel-heading" id="prscriptionHeading" role="tab">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#patientMngtAccordion" href="#prescriptionCollapse">
+                    Prescription History
+                </a>
+            </h4>
+        </div>
+
+    <!-- collapse part -->
+    <div class="panel-collapse collapse" id="prescriptionCollapse" role="tabpanel">
+        <div class="panel-body">
+            
+            <div class="panel-group" id="prescriptionForm">
+                <div class="panel">
+                    <button class="btn btn-primary" data-parent="#prescriptionForm" data-toggle="collapse" href="#prescriptionFormProper" ng-click="addPrescription()">
+                        New Prescription
+                    </button>
+
+                    <div class="panel-collapse collapse" id="prescriptionFormProper">
+                        <div class="panel-body">
+
+                        <br/>
+
+                        <!-- pre-existing data row -->
+                        <div class="row" ng-repeat="prescription in prescription.prescriptionPerMedicineWithData">
+                       
+                        <!-- generic name + brand name -->
+                        <div class="col-lg-5">
+                        <div class="form-group">
+                            <input class="form-control" ng-init="fixMedicineName(prescription)" ng-model="prescription.fixedName" ng-readonly="true"/>
+                        </div>
+                        </div>
+
+                        <!-- quantity -->
+                        <div class="col-lg-2">
+                        <div class="form-group">
+                            <textarea class="form-control" ng-model="prescription.quantity" ng-readonly="true"></textarea>
+                        </div>
+                        </div>
+
+                        <!-- instruction -->
+                        <div class="col-lg-4">
+                        <div class="form-group">
+                            <textarea class="form-control" ng-model="prescription.instruction" ng-readonly="true"></textarea>
+                        </div>
+                        </div>
+
+                        <!-- x button -->
+                        <div class="col-lg-1">
+                            <button class="btn btn-default" ng-click="splicePrescription(prescription)">
+                                <span class="glyphicon glyphicon-remove"></span>
+                            </button>
+                        </div>
+                    
+                        </div> <!-- end data rows -->
+
+
+                        <!-- inputs row -->
+                        <div class="row">
+
+                        <!-- medicine -->
+                        <div class="col-lg-5">
+                        <div class="form-group">
+                            <input class="form-control" placeholder="Search" ng-model="query.genericName" ng-focus="focus=true"/>
+                        </div>
+                        <div id="search-results" ng-show="focus">
+                            <div href="#!" class="search-result" ng-repeat="medicine in allMedicines | searchMedicines:query.genericName" ng-click="setQuery(medicine)">
+                                {{ medicine.genericName }}
+                            </div>
+                        </div>
+                        </div>
+
+                        <!-- quantity -->
+                        <div class="col-lg-2">
+                        <div class="form-group">
+                            <textarea class="form-control" placeholder="Quantity" rows="2" ng-model="object.quantity"></textarea>
+                        </div>
+                        </div>
+
+                        <!-- instruction -->
+                        <div class="col-lg-4">
+                        <div class="form-group">
+                            <textarea class="form-control" placeholder="Instruction" rows="2" ng-model="object.instruction"></textarea>
+                        </div>
+                        </div>
+
+                        <!-- + button -->
+                        <div class="col-lg-1">
+                        <button class="btn btn-default" ng-click="pushPrescription()" ng-disabled="query.genericName == 0 || object.quantity == 0 || object.instruction == 0">
+                                <span class="glyphicon glyphicon-plus"></span>
+                            </button>
+                        </div>
+                        </div>
+
+                        <!-- buttons collection -->
+                        <div class="row">
+
+                            <!-- empty space -->
+                            <div class="col-lg-6">
+
+                            </div>
+
+                            <!-- save -->
+                            <div class="col-lg-2">
+                                <button class="btn btn-default btn-block" data-toggle="collapse" data-target="#prescriptionFormProper" ng-click="update()" ng-show="prescription._id != ''">Save</button>
+                            </div>
+
+                            <!-- save as new -->
+                            <div class="col-lg-2">
+                                <button class="btn btn-default btn-block" data-toggle="collapse" data-target="#prescriptionFormProper" ng-click="save()" ng-disabled="prescription.prescriptionPerMedicineWithData.length == 0">Save as new</button>
+                            </div>
+
+                            <!-- generate -->
+                            <div class="col-lg-2">
+                                <button class="btn btn-default btn-block" ng-click="generatePrescription()">Generate</button>
+                            </div>
+                        
+                        </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>  
+
+
+        <!-- table of data -->
+        <table class="table" ng-show="allPrescriptionsForPatient.length > 0"> 
+        <thead>
+            <tr>
+                <th>Date Issued</th>
+                <th>Prescription</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="prescription in allPrescriptionsForPatient">
+                <td ng-init="fixDate(prescription)">{{ prescription.fixedDate }}</td>
+                <td>
+                    <ul>
+                        <li ng-repeat="medicine in prescription.prescriptionPerMedicineWithData">
+                            {{ medicine.brandName }} | {{ medicine.quantity }} | {{ medicine.instruction }}
+                        </li>
+                    </ul>
+                </td>
+                <td>
+                    <!-- edit button -->
+                    <button class="btn btn-primary" data-toggle="collapse" data-target="#prescriptionFormProper" ng-click="editPrescription(prescription)">
+                        <span class="glyphicon glyphicon-pencil"></span>
+                    </button>
+
+                    <!-- delete button that will show the modal -->
+                    <button class="btn btn-primary" data-toggle="modal" data-target=".confirmation-modal-sm" ng-click="setDeleteKeyAndFactorForPrescription(prescription._id)">
+                        <span class="glyphicon glyphicon-remove"></span>
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+        </table>
+
+
+    </div>
+    </div> <!-- prescription -->
+
+
+    <!-- abstract -->
+    <div class="panel panel-default">
+        <div class="panel-heading" id="abstractHeading" role="tab">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#patientMngtAccordion" href="#abstractCollapse">
+                    Abstract History
+                </a>
+            </h4>
+        </div>
+
+    <!-- collapse part -->
+    <div class="panel-collapse collapse" id="abstractCollapse" role="tabpanel">
+        <div class="panel-body">
+        
+            <div class="panel-group" id="abstractForm">
+                <div class="panel">
+                    <button class="btn btn-primary" data-parent="#abstractForm" data-toggle="collapse" href="#abstractFormProper" ng-click="addAbstract()">
+                        New Abstract
+                    </button>
+                    <div class="panel-collapse collapse" id="abstractFormProper">
+                    <div class="panel-body">    
+                    
+                        <br/>
+                        <div class="row">
+                            <div class="col-lg-10 col-lg-push-1">
+                            <div class="form-group">
+                                <textarea class="form-control" rows="15" ng-model="abstract.content"></textarea>
+                            </div>
+                            </div>
+                        </div>
+
+                        <!-- buttons collection -->
+                        <div class="row">
+                            <!--
+                            <div class="col-lg-6 col-lg-push-7">
+                            <button class="btn btn-default" data-toggle="collapse" data-target="#abstractFormProper" ng-click="update()" ng-show="abstract._id != ''">Save</button>
+                            <button class="btn btn-default" data-toggle="collapse" data-target="#abstractFormProper" ng-click="save()">Save as new</button>
+                            <button class="btn btn-default" ng-click="generateAbstract()">Generate</button>
+                            </div>
+                            -->
+
+                            <!-- empty space -->
+                            <div class="col-lg-6">
+
+                            </div>
+
+                            <!-- save button -->
+                            <div class="col-lg-2">
+                                <button class="btn btn-default btn-block" data-toggle="collapse" data-target="#abstractFormProper" ng-click="update()" ng-show="abstract._id != ''">Save</button>
+                            </div>
+
+                            <!-- save as new -->
+                            <div class="col-lg-2">
+                                <button class="btn btn-default btn-block" data-toggle="collapse" data-target="#abstractFormProper" ng-click="save()">Save as new</button>
+                            </div>
+
+                            <!-- generate -->
+                            <div class="col-lg-2">
+                                <button class="btn btn-default btn-block" ng-click="generateAbstract()">Generate</button>
+                            </div>
+                        </div>
+
+                    </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- table of data -->
+        <table class="table" ng-show="allAbstractsForPatient.length != 0">
+            <thead>
+                <tr>
+                    <th>Date Issued</th>
+                    <th>Content</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="abstract in allAbstractsForPatient">
+                    <td ng-init="fixDate(abstract)">{{ abstract.fixedDate }}</td>
+                    <td>{{ abstract.content }}</td>
+                    <td>
+                        <!-- edit button -->
+                        <button class="btn btn-primary" data-toggle="collapse" data-target="#abstractFormProper" ng-click="editAbstract(abstract)">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                        </button>
+
+                        <!-- delete button that will show the modal -->
+                        <button class="btn btn-primary" data-toggle="modal" data-target=".confirmation-modal-sm" ng-click="setDeleteKeyAndFactorForAbstract(abstract._id)">
+                            <span class="glyphicon glyphicon-remove"></span>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+    </div> <!-- abstract -->
+
+
+    </div> <!-- accordion -->
+
+</div> <!-- end main content -->
+
+
+<!-- right side bar -->
+<div class="col-lg-2">
+    
+</div> <!-- end right side bar -->
+
+
+</div>
+
+
+
+
+
+<!-- modal for deletion -->
+<div class="modal fade confirmation-modal-sm" tabindex="-1" role="dialog" aria-labelledby="confirmation modal">
+<div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+        <!-- header -->
+        <div class="modal-header">
+            <h4 class="modal-title">Are you sure you want to delete?</h4>
+        </div>
+
+        <!-- footer -->
+        <div class="modal-footer">
+            <div class="row">
+
+                <!-- yes button -->
+                <div class="col-lg-6">
+                    <button type="button" class="btn btn-primary btn-block" data-dismiss="modal" aria-label="Yes" id="yesbutton" ng-click="delete()">
+                        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+                    </button>
+                </div>
+
+                <!-- no button -->
+                <div class="col-lg-6">
+                    <button type="button" class="btn btn-primary btn-block" data-dismiss="modal" aria-label="No" id="nobutton" ng-click="resetGlobalVars()">
+                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+</div> <!-- end modal for deletion -->
+
+<!-- modal for request forms -->
+<div class="modal fade" id="generateRequestForm">
+<div class="modal-dialog">
+<div class="modal-content">
+    <div class="modal-header">
+        <h4 class="modal-title">Request Form</h4>
+    </div>
+
+    <div class="modal-body">
+        <div class="form-group" ng-init="requestFormObjectChange()">
+            <textarea class="form-control" rows="5" disabled ng-model="requestFormObject.words">
+
+            </textarea>
+        </div>
+
+        <label>List of requests: </label>
+
+        <!-- printing entries -->
+        <div class="form-group" ng-repeat="request in requestFormObject.arrRequests">
+        <div class="input-group">
+            <input type="text" class="form-control" ng-model="request"/>
+            <span class="input-group-btn">
+                <button type="button" class="btn btn-default" ng-click="spliceInRequestFormObject(request)"> 
+                    Del
+                </button>
+            </span>
+        </div>
+        </div>
+
+        <!-- request entry -->
+        <div class="form-group">
+        <div class="input-group">
+            <input type="text" class="form-control" ng-model="requestFormObject.requestText"/>
+            <span class="input-group-btn">
+                <button class="btn btn-default" ng-click="pushInRequestFormObject()">
+                    Add
+                </button>
+            </span>
+        </div>
+        </div>
+
+        <p ng-show="requestFormObject.error" class="help-block">No duplicates allowed.</p>
+
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary btn-block" data-dismiss="modal" ng-disabled="requestFormObject.arrRequests <= 0" ng-click="generateRequestForm()">Generate</button>
+    </div>
+</div>
+</div>
+</div>
+
+<!-- modal for referral forms -->
+<div class="modal fade" id="generateReferralForm">
+<div class="modal-dialog">
+<div class="modal-content">
+    <div class="modal-header">
+        <h4 class="modal-title">Referral Form</h4>
+    </div>
+
+    <div class="modal-body">
+        <div class="form-group">
+            <textarea class="form-control" rows="8" disabled ng-model="referralFormObject.words">
+
+            </textarea>
+        </div>
+
+        <!-- entry for doctor to refer to and referral for what -->
+        <label for="doctorToReferTo">Doctor to refer to:</label>
+        <div class="form-group">
+            <input type="text" class="form-control" id="doctorToReferTo" ng-bind="referralFormObjectChange()" ng-model="referralFormObject.doctorToReferTo"/>
+        </div>
+
+        <label for="referralFor">Referring for:</label>
+        <div class="form-group">
+            <input type="text" class="form-control" id="referralFor" ng-model="referralFormObject.referringFor"/>
+        </div>
+
+        <label for="diagnosesToInclude">Diagnoses to include: </label>
+        <div class="form-group" ng-repeat="diagnosis in referralFormObject.arrDiagnosesToInclude">
+        <div class="input-group">
+            <input type="text" class="form-control" disabled ng-model="diagnosis.name"/>
+            <span class="input-group-btn">
+                <button type="button" class="btn btn-default" ng-click="spliceInReferralFormObject(diagnosis)">Del</button>
+            </span> 
+        </div>
+        </div>
+
+        <label for="addirionalNotes">Additional notes: </label>
+        <div class="form-group">
+            <textarea class="form-control" id="additionalNotes" rows="3" ng-model="referralFormObject.additionalNotes">
+
+            </textarea>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary btn-block" data-dismiss="modal" ng-disabled="!referralFormObject.doctorToReferTo || !referralFormObject.referringFor || referralFormObject.arrDiagnosesToInclude.length == 0" ng-click="generateReferralForm()">Generate</button>
+    </div>
+</div>
+</div>
+</div>
+
+
+<!-- modal for certificates -->
+<div class="modal fade" id="generateCertificate">
+<div class="modal-dialog">
+<div class="modal-content">
+    <div class="modal-header">
+        <h4 class="modal-title">Certificate generator</h4>
+    </div>
+
+    <div class="modal-body">
+    <!-- textarea to show my current words -->
+    <div class="form-group">
+        <textarea class="form-control" rows="8" ng-model="certificateFormObject.words">
+
+        </textarea>
+    </div>
+
+    <!-- use input -->
+    <label for="use">Use: </label>
+    <div class="form-group">
+        <input type="text" class="form-control" id="use" ng-model="certificateFormObject.use" ng-bind="certificateFormObjectChange()"/>
+    </div>
+
+
+    <!-- menu of diagnoses to be included -->
+    <label>Diagnoses to include: </label>
+    <div class="form-group" ng-repeat="diagnosis in certificateFormObject.arrDiagnosesToInclude">
+    <div class="input-group">
+        <input type="text" class="form-control" disabled ng-model="diagnosis.name"/>
+        <div class="input-group-btn">
+            <button class="btn btn-default" ng-click="spliceInCertificateObject(diagnosis)">
+                Del
+            </button>
+        </div>
+    </div>
+    </div> 
+
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary btn-block" data-dismiss="modal" ng-disabled="!certificateFormObject.use || certificateFormObject.arrDiagnosesToInclude.length == 0" ng-click="generateCertificate()">Generate</button>
+    </div>
+</div>
+</div>
+</div>

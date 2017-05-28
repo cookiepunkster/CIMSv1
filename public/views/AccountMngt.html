@@ -1,0 +1,293 @@
+<div class="container-fluid">
+
+<!-- extra side -->
+<div class="col-lg-2">
+
+</div>
+
+<!-- main content -->
+<div class="col-lg-8">
+<form role="form" name="accountForm" ng-submit="updateAccount()">
+
+<!-- name fields -->
+<div class="row">
+
+<!-- first name -->
+<div class="col-lg-5">
+<div class="form-group">
+    <label for="firstName">First name:</label>
+    <input type="text" class="form-control" id="firstName" ng-required="true" ng-model="loggedInUser.firstName"/>
+</div>
+</div>
+
+<!-- last name -->
+<div class="col-lg-5">
+<div class="form-group">
+    <label for="lastName">Last name:</label>
+    <input type="text" class="form-control" id="lastName" ng-required="true" ng-model="loggedInUser.lastName"/>
+</div>
+</div>
+
+<!-- middle name -->
+<div class="col-lg-2">
+<div class="form-group">
+    <label for="middleName">Middle name:</label>
+    <input type="text" class="form-control" id="middleName" ng-required="true" ng-model="loggedInUser.middleName"/>
+</div>
+</div>
+
+</div>
+
+<!-- ptr row -->
+<div class="row">
+<div class="col-lg-7">
+<div class="form-group">
+    <label for="ptr">PTR:</label>
+    <input type="text" class="form-control" id="ptr" ng-required="true" ng-model="loggedInUser.ptr"/>
+</div>
+</div>
+</div>
+
+
+<!-- addresses row -->
+<div class="row">
+
+<label>Addresses:</label>
+
+<div ng-repeat="address in loggedInUser.addresses">
+
+<!-- room number and main address -->
+<div class="row">
+<!-- room number -->
+<div class="col-lg-4">
+<div class="form-group">
+    <label for="roomNumber">Room #:</label>
+    <input type="text" class="form-control" id="roomNumber" ng-required="true" ng-model="address.roomNumber"/>
+</div>
+</div>
+
+<!-- main address -->
+<div class="col-lg-8">
+<div class="form-group">
+    <label for="mainAddress">Main address:</label>
+    <input type="text" class="form-control" id="mainAddress" ng-required="true" ng-model="address.mainAddress"/>
+</div>
+</div>
+
+</div> <!-- addresses -->
+
+
+<!-- row for time slots and contact number -->
+<div class="row">
+
+<!-- time slots -->
+<div class="col-lg-5">
+
+<!-- just printing -->
+<label>Time slots:</label>
+<div class="form-group" ng-repeat="time in address.timeSlots">
+<div class="input-group">
+    <input type="text" class="form-control" ng-model="time"/>
+    <span class="input-group-btn">
+        <button type="button" class="form-control">
+            <span class="glyphicon glyphicon-minus"></span>
+        </button>
+    </span>
+</div>
+</div>
+
+<!-- adding -->
+<div class="form-group">
+<div class="input-group">
+    <input type="text" class="form-control" ng-model="timeSlots"/>
+    <span class="input-group-btn">
+        <button type="button" class="form-control">
+            <span class="glyphicon glyphicon-plus"></span>
+        </button>
+    </span>
+</div>
+</div>
+
+</div>
+
+<!-- contact number -->
+<div class="col-lg-7">
+<div class="form-group">
+    <label for="contactNumber">Contact #:</label>
+    <input type="text" class="form-control" id="contactNumber" ng-required="true" ng-model="address.contactNumber"/>
+</div>
+</div>
+
+</div> <!-- time slots and # -->
+
+
+<!-- buttons -->
+<div class="row">
+<div class="col-lg-9">
+</div>
+
+<div class="col-lg-3">
+<div class="form-group">
+    <button type="button" class="form-control" ng-click="spliceAddress(address)">Delete Address</button>
+</div>
+</div>
+</div>
+
+</div> <!-- whole address form-->
+
+<hr/>
+
+
+
+
+<div>
+
+<!-- room number and main address -->
+<div class="row">
+<!-- room number -->
+<div class="col-lg-4">
+<div class="form-group">
+    <label for="roomNumber">Room #:</label>
+    <input type="text" class="form-control" id="roomNumber" ng-model="addressObject.roomNumber"/>
+</div>
+</div>
+
+<!-- main address -->
+<div class="col-lg-8">
+<div class="form-group">
+    <label for="mainAddress">Main address:</label>
+    <input type="text" class="form-control" id="mainAddress" ng-model="addressObject.mainAddress"/>
+</div>
+</div>
+
+</div> <!-- addresses -->
+
+
+<div class="row">
+
+<!-- time slots -->
+<div class="col-lg-5">
+
+<!-- just printing -->
+<label>Time slots:</label>
+<div class="form-group" ng-repeat="time in addressObject.timeSlots">
+<div class="input-group">
+    <input type="text" class="form-control" ng-model="time" />
+    <span class="input-group-btn">
+        <button type="button" class="form-control" ng-click="spliceTimeslot(time)">
+            <span class="glyphicon glyphicon-minus"></span>
+        </button>
+    </span>
+</div>
+</div>
+
+<!-- adding -->
+<div class="form-group">
+<div class="input-group">
+    <input type="text" class="form-control" ng-model="timeSlot"/>
+    <span class="input-group-btn">
+        <button type="button" class="form-control" ng-click="pushTimeslot()">
+            <span class="glyphicon glyphicon-plus"></span>
+        </button>
+    </span>
+</div>
+</div>
+
+</div>
+
+<!-- contact number -->
+<div class="col-lg-7">
+<div class="form-group">
+    <label for="contactNumber">Contact #:</label>
+    <input type="text" class="form-control" id="contactNumber" ng-model="addressObject.contactNumber"/>
+</div>
+</div>
+
+</div> <!-- time slots and # -->
+
+
+<!-- buttons -->
+<div class="row">
+<div class="col-lg-9">
+</div>
+
+<div class="col-lg-3">
+<div class="form-group">
+    <button type="button" class="form-control" ng-click="pushAddress()">Add Address</button>
+</div>
+</div>
+</div>
+
+</div>
+
+
+
+
+<!-- save button all in all -->
+<div class="row">
+<div class="col-lg-6"></div>
+
+<div class="col-lg-3">
+<div class="form-group">
+    <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target=".confirmation-modal-sm">DELETE</button>
+</div>
+</div>
+
+<div class="col-lg-3">
+<div class="form-group">
+    <button type="button" class="btn btn-primary btn-block" ng-click="save()">SAVE</button>
+</div>
+</div>
+</div>
+
+</form>
+</div> <!-- col div -->
+
+
+
+<!-- extra side -->
+<div class="col-lg-2">
+
+</div>
+
+</div>
+
+
+<!-- modal for deletion -->
+<div class="modal fade confirmation-modal-sm" tabindex="-1" role="dialog" aria-labelledby="confirmation modal">
+<div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+        <!-- header -->
+        <div class="modal-header">
+            <h4 class="modal-title">Are you sure you want to delete?</h4>
+        </div>
+
+        <!-- footer -->
+        <div class="modal-footer">
+            <div class="row">
+
+                <!-- yes button -->
+                <div class="col-lg-6">
+                    <button type="button" class="btn btn-primary btn-block" data-dismiss="modal" aria-label="Yes" id="yesbutton" ng-click="delete()">
+                        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+                    </button>
+                </div>
+
+                <!-- no button -->
+                <div class="col-lg-6">
+                    <button type="button" class="btn btn-primary btn-block" data-dismiss="modal" aria-label="No" id="nobutton">
+                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+</div> <!-- end modal for deletion -->
+
+</div>
+</div> <!-- end row for table of data -->
+
+
+</div>

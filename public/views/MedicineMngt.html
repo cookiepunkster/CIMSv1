@@ -1,0 +1,162 @@
+<div class="container-fluid" ng-init="initializeData()">
+
+<!-- row for search and button -->
+<div class="row">
+
+
+<div class="col-lg-1 col-lg-push-2"> 
+    <button class="btn btn-default btn-block" ng-click="pathToNavigator()">
+        <i class="glyphicon glyphicon-chevron-left"></i>
+        Back
+    </button>
+</div>
+
+<!-- div for search bar -->
+<div class="col-lg-5 col-lg-push-2">
+
+    <div class="form-group">
+    <div class="input-group">
+        <input type="text" class="form-control" id="searchbar" placeholder="Search..." ng-model="searchText"/>
+        <span class="input-group-btn" aria-hidden="true">
+            <button class="btn btn-primary" type="button">Go!</button>
+        </span>
+    </div>
+    </div>
+</div> <!-- end div for search bar -->
+
+<!-- div for "add" button -->
+<div class="col-lg-2 col-lg-push-2">
+    <button class="btn btn-primary btn-block" type="button" id="addbutton" data-toggle="collapse" data-target="#fieldsPanel" ng-click="toggleAdd()">Add</button>
+</div> <!-- end div for "add" -->
+
+</div> <!-- end row for search and button -->
+
+<!-- row for collapsing panel -->
+<div class="row">
+
+<!-- collapsing fields panel -->
+<div class="col-lg-8 col-lg-push-2">
+    <div class="collapse" id="fieldsPanel">
+    <form role="form" name="medicineForm" ng-submit="save()">
+
+    <!-- row of fields -->
+    <div class="row">
+
+
+    <!-- generic name input -->
+    <div class="col-lg-3">
+        <div class="form-group">
+            <input type="text" class="form-control" id="genericName" placeholder="Generic Name" ng-required="true" ng-model="medicine.genericName"/>
+        </div>
+    </div> <!-- end generic name input -->
+
+
+    <!-- brand name input -->
+    <div class="col-lg-3">
+        <div class="form-group">
+            <input type="text" class="form-control" id="brandName" placeholder="Brand Name" ng-required="true" ng-model="medicine.brandName"/>
+        </div>
+    </div> <!-- brand name  -->
+
+
+    <!-- dose input -->
+    <div class="col-lg-3">
+        <div class="form-group">
+            <input type="text" class="form-control" id="doses" placeholder="Dose" ng-required="true" ng-model="medicine.dose"/>
+        </div>
+    </div> <!-- dose -->
+
+
+    <!-- save button -->
+    <div class="col-lg-3">
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary btn-block" id="savebutton" data-toggle="collapse" data-target="#fieldsPanel" ng-disabled="medicineForm.$invalid">
+                Save
+            </button>
+        </div>
+    </div> <!-- end save button -->
+
+
+    </div> <!-- end row of fields -->
+
+    </form>
+    </div>
+</div>
+<!-- end code for collapsing fields panel -->
+
+</div> <!-- end row for collapsing -->
+
+
+<!-- row for table of data -->
+<div class="row">
+<div class="col-lg-8 col-lg-push-2">
+
+<table class="table">
+    <thead>
+        <tr>
+            <th class="col-sm-4">Generic Name</th>
+            <th class="col-sm-3">Brand Name</th>
+            <th class="col-sm-3">Dose</th>
+            <th class="col-sm-2">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="medicine in allMedicines | filter: searchText">
+            <td>{{ medicine.genericName }}</td>
+            <td>{{ medicine.brandName }}</td>
+            <td>{{ medicine.dose }}</td>
+            <td>
+
+                <!-- edit button --> 
+                <button type="button" class="btn btn-primary" aria-label="Edit"  data-toggle="collapse" data-target="#fieldsPanel" ng-click="toggleUpdate(medicine)">
+                    <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                </button>
+
+                <!-- delete button that shows a modal -->
+                <button type="button" class="btn btn-primary" aria-label="Delete" data-toggle="modal" data-target=".confirmation-modal-sm" ng-click="toggleDelete(medicine)">
+                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                </button>
+
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<!-- modal for deletion -->
+<div class="modal fade confirmation-modal-sm" tabindex="-1" role="dialog" aria-labelledby="confirmation modal">
+<div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+        <!-- header -->
+        <div class="modal-header">
+            <h4 class="modal-title">Are you sure you want to delete?</h4>
+        </div>
+
+        <!-- footer -->
+        <div class="modal-footer">
+            <div class="row">
+
+                <!-- yes button -->
+                <div class="col-lg-6">
+                    <button type="button" class="btn btn-primary btn-block" data-dismiss="modal" aria-label="Yes" id="yesbutton" ng-click="delete()">
+                        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+                    </button>
+                </div>
+
+                <!-- no button -->
+                <div class="col-lg-6">
+                    <button type="button" class="btn btn-primary btn-block" data-dismiss="modal" aria-label="No" id="nobutton" ng-click="resetEverything()">
+                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+</div> <!-- end modal for deletion -->
+
+</div>
+</div> <!-- end row for table of data -->
+
+
+</div>

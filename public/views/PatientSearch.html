@@ -1,0 +1,257 @@
+<div class="container-fluid" ng-init="initializeData()">
+
+<!-- row for search and button -->
+<div class="row">
+
+<!-- div for back button -->
+<div class="col-lg-1 col-lg-push-2">
+    <button class="btn btn-default btn-block" ng-click="pathToNavigator()">
+        <i class="glyphicon glyphicon-chevron-left"></i>
+        Back
+    </button>
+</div>
+
+<!-- div for search bar -->
+<div class="col-lg-5 col-lg-push-2">
+    <div class="form-group">
+    <div class="input-group">
+        <input type="text" class="form-control" id="searchbar" placeholder="Search..." ng-model="searchText"/>
+        <span class="input-group-btn" aria-hidden="true">
+            <button class="btn btn-primary" type="button">Go!</button>
+        </span>
+    </div>
+    </div>
+</div> <!-- end div for search bar -->
+
+<!-- div for "add" button -->
+<div class="col-lg-2 col-lg-push-2">
+    <button class="btn btn-primary btn-block" type="button" id="addbutton" data-toggle="collapse" data-target="#fieldsPanel" ng-click="toggleAdd()">Add</button>
+</div> <!-- end div for "add" -->
+
+</div> <!-- end row for search and button -->
+
+
+<!-- row for collapsing panel -->
+<div class="row">
+
+<!-- collapsing fields panel -->
+<div class="col-lg-8 col-lg-push-2">
+    <div class="collapse" id="fieldsPanel">
+    <form role="form" name="medicineForm" ng-submit="save()">
+
+    <!-- row of name fields -->
+    <div class="row">
+
+        <!-- first name -->
+        <div class="col-lg-3">
+        <div class="form-group">
+            <label for="lastName">First Name:</label>
+            <input type="text" class="form-control" id="lastName" ng-model="patient.firstName"/>
+        </div>
+        </div> <!-- end first name -->
+
+        <!-- last name -->
+        <div class="col-lg-4">
+        <div class="form-group">
+            <label for="lastName">Last Name:</label>
+            <input type="text" class="form-control" id="lastName" ng-model="patient.lastName"/>
+        </div>
+        </div> <!-- end last name -->
+
+        <!-- middle name -->
+        <div class="col-lg-3">
+        <div class="form-group">
+            <label for="middleName">Middle Name:</label>
+            <input type="text" class="form-control" id="middleName" ng-model="patient.middleName"/>
+        </div>
+        </div> <!-- end middle name -->
+
+        <!-- blank space -->
+        <div class="col-lg-3">
+        </div>
+
+    </div>
+
+    
+    <!-- bday and sex fields -->
+    <div class="row">
+
+        <!-- birthday -->
+        <div class="col-lg-4">
+        <div class="form-group">
+            <label for="birthdate">Birthday:</label>
+            <div class="input-group date">
+                <input type="date" class="form-control" id="birthdate" ng-model="patient.birthdate"/>
+                <span class="input-group-addon">
+                    <i class="glyphicon glyphicon-calendar"></i>
+                </span>
+            </div>
+        </div>
+        </div>
+
+        <!-- sex -->
+        <div class="col-lg-6">
+        <div class="form-group">
+
+            <label for="sex">Sex:</label>
+            
+            <!-- options -->
+            <div id="sex">
+            <label class="checkbox-inline">
+            <input type="checkbox" id="Foption" value="F" ng-model="patient.sex.F"> F
+            </label>
+
+            <label class="checkbox-inline">
+            <input type="checkbox" id="Moption" value="M" ng-model="patient.sex.M"> M
+            </label>
+            </div>
+
+        </div>
+        </div>
+
+    </div> <!-- end bday and sex fields -->
+
+
+    <!-- address and contact number fields -->
+    <div class="row">
+
+        <!-- address -->
+        <div class="col-lg-6">
+        <div class="form-group">
+
+            <label for="address">Address: </label>
+            <input type="text" class="form-control" id="address" ng-required="true" ng-model="patient.address"/>
+
+        </div>
+        </div>
+
+        <!-- contact number -->
+        <div class="col-lg-4">
+        <div class="form-group">
+
+            <label for="contactNumber">Contact number:</label>
+            <input type="number" class="form-control" id="contactNumber" ng-required="true" ng-model="patient.contactNumber"/>
+
+        </div>
+        </div>
+
+    </div> <!-- end address and contact number fields -->
+
+
+    <!-- submit row -->
+    <div class="row">
+
+        <!-- button -->
+        <div class="col-lg-3 col-lg-push-9">
+            <button type="submit" class="btn btn-primary btn-block" id="submitForm" data-toggle="collapse" data-target="#fieldsPanel">
+                Save
+            </button>
+        </div>
+
+    </div> <!-- end submit row-->
+
+
+    </form>
+    </div>
+</div>
+<!-- end code for collapsing fields panel -->
+
+</div> <!-- end row for collapsing -->
+
+
+<!-- table with data -->
+<div class="row">
+<div class="col-lg-8 col-lg-push-2">
+    <table class="table table-hover" >
+        <thead>
+            <tr>
+            <th>Name</th>
+            <th>Sex</th>
+            <th>Birthday</th>
+            <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr data-toggle="collapse" data-target="#{{patient.lastName}}" class="accordion-toggle" ng-repeat-start="patient in allPatients | filter: searchText">
+            
+            <td>
+                <a href="#!" ng-click="highlightPatient(patient)" ng-show="!bNotAllPrivileges">{{ patient.lastName }}, {{ patient.firstName }} {{ patient.middleName }}</a>
+                <p ng-show="bNotAllPrivileges">{{ patient.lastName }}, {{ patient.firstName }} {{ patient.middleName }}</p>
+            </td>
+            <td>{{ patient.sex }}</td>
+            <td ng-init="processBirthdateForDisplay(patient)">{{ patient.birthday }}</td>
+            <td>
+
+                <!-- edit button --> 
+                <button type="button" class="btn btn-primary" aria-label="Edit"  data-toggle="collapse" data-target="#fieldsPanel" ng-click="toggleUpdate(patient)">
+                    <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                </button>
+
+                <!-- delete button that shows a modal -->
+                <button type="button" class="btn btn-primary" aria-label="Delete" data-toggle="modal" data-target=".confirmation-modal-sm" ng-click="toggleDelete(patient)">
+                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                </button>
+            </td>
+
+            </tr>
+            
+            <!-- hidden patient record summary -->
+            <tr ng-repeat-end>
+                <td colspan="4" class="hiddenRow" ng-init="initializePatientData(patient)">
+                    <div class="accordian-body collapse" id="{{ patient.lastName }}">
+                        <ul ng-show="!patient.lastDiagnosis.message">
+                            <li ng-repeat="sickness in patient.lastDiagnosis.arrDiagnoses">
+                                {{ sickness.name }}
+                            </li>
+                        </ul>
+                        <div ng-show="patient.lastDiagnosis.message">
+                            {{ patient.lastDiagnosis.message }}
+                        </div>
+                    </div>
+                </td>
+            </tr> <!-- end hidden patient record summary -->
+
+        </tbody>
+    </table>
+</div>
+</div>
+
+
+<!-- modal for deletion -->
+<div class="modal fade confirmation-modal-sm" tabindex="-1" role="dialog" aria-labelledby="confirmation modal">
+<div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+        <!-- header -->
+        <div class="modal-header">
+            <h4 class="modal-title">Are you sure you want to delete?</h4>
+        </div>
+
+        <!-- footer -->
+        <div class="modal-footer">
+            <div class="row">
+
+                <!-- yes button -->
+                <div class="col-lg-6">
+                    <button type="button" class="btn btn-primary btn-block" data-dismiss="modal" aria-label="Yes" id="yesbutton" ng-click="delete()">
+                        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+                    </button>
+                </div>
+
+                <!-- no button -->
+                <div class="col-lg-6">
+                    <button type="button" class="btn btn-primary btn-block" data-dismiss="modal" aria-label="No" id="nobutton" ng-click="resetPatient()">
+                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+</div> <!-- end modal for deletion -->
+
+</div>
+</div>
+
+
+</div>
