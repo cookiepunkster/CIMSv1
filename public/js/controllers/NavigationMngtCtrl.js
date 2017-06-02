@@ -2,6 +2,7 @@ angular.module('NavigationMngtCtrl', [])
 
     .controller("NavigationMngtController", function($scope, $location) {
 
+        // paths to modules
         $scope.navigateToPatients = function() {
             $location.path('/patientsearch');
         };
@@ -13,6 +14,5 @@ angular.module('NavigationMngtCtrl', [])
         $scope.navigateToDiseases = function() {
             $location.path('/diseasemngt');
         };
-
 
     });

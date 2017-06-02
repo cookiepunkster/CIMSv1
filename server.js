@@ -12,7 +12,7 @@ var session         = require("express-session");
  * SERVER CONFIGURATION
  */
 // port number config
-var port = process.env.PORT || 3000;
+var port = process.env.PORT || 8080;
 
 // parsing data config
 app.use(bodyParser.json());
@@ -49,9 +49,13 @@ app.get('*', function(req, res) {
  */
 
 var mongoose        = require('mongoose');
-var db              = 'mongodb://127.0.0.1/medData';
+var db              = 'mongodb://jolly:jolly@ds161551.mlab.com:61551/meddata';
 
 mongoose.connect(db);
+
+mongoose.connection.on("open", function(ref) {
+  console.log("Connected to mongo server.");
+});
 
 /**
  * 

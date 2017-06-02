@@ -11,24 +11,25 @@ angular.module("AccountMngtCtrl", [])
             "mainAddress"    : "",
             "timeSlots"      : [],
             "contactNumber"  : ""
-        }
+
+        };
 
         $scope.timeSlot = "";
 
         // geting the logged in user
         Users.getLoggedInUser().then(function(results) {
             $scope.loggedInUser = results;
-            console.log($scope.loggedInUser);
         });
 
         $scope.spliceAddress = function(address) {
             var index = $scope.loggedInUser.addresses.indexOf(address);
+            
             if(index != -1)
                 $scope.loggedInUser.addresses.splice(index, 1);
         };
     
         $scope.pushAddress = function() {
-            console.log($scope.addressObject);
+            
             $scope.loggedInUser.addresses.push($scope.addressObject);
             $scope.addressObject = {
         
@@ -36,7 +37,8 @@ angular.module("AccountMngtCtrl", [])
                 "mainAddress"    : "",
                 "timeSlots"      : [],
                 "contactNumber"  : ""
-            }
+            };
+            
         };
 
         $scope.spliceTimeslot = function(timeslot) {

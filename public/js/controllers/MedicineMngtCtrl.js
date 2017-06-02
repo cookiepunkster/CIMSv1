@@ -51,7 +51,7 @@ angular.module("MedicineMngtCtrl", [])
 
         // function for resetting values
         $scope.resetEverything = function() {
-            console.log("restting everything");
+            
             $scope.bIsAdding = false;
             $scope.bIsUpdating = false;
 

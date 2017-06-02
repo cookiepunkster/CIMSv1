@@ -10,6 +10,9 @@ module.exports = function(app) {
         Abstract.find({
             patientID   : objectId(strPatientID)
         })
+            .sort({
+                dateIssued : 'descending'
+            })
             .exec(function(err, abstracts) {
                 if(err) {
                     res.send(err);
@@ -81,7 +84,6 @@ module.exports = function(app) {
             if(err) {
                 res.send({ "message" : err });
             } else {
-                console.log(abstract);
                 res.send({ "message" : "successfully updated abstract" });
             };
         });

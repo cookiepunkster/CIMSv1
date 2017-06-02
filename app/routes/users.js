@@ -35,7 +35,6 @@ module.exports = function(app) {
                     res.send(user);
                 };
             };
-            console.log("hello");
         });             
 
     });
@@ -49,7 +48,6 @@ module.exports = function(app) {
             if(err) {
                 res.send(err);
             } else {
-                console.log(user);
                 res.send(user);
             };
         });      
@@ -81,9 +79,9 @@ module.exports = function(app) {
                 res.status(401).send("Error!");
             } else {
                 if(!user) {
-                    res.send({"message" : "Error in signing up!"});
+                    res.send({ "message" : "Error in signing up!" });
                 } else {
-                    res.send("User");
+                    res.send({ "message" : user });
                 };
             };
         });
@@ -113,18 +111,19 @@ module.exports = function(app) {
                     "addresses" : req.body.addresses.slice()
                 }},
                 {
-                    upsert : true
+                    new : true
                 },
         function(err, user) {
             if(err) {
                 res.send(err);
             } else {
-                console.log("updated: " + user);
 
                 /**
                  * NOTICE ME
                  */
                 req.session.loggedInUser = user;
+
+                console.log("updated: " + user);
 
                 res.send(user);
             };
@@ -142,7 +141,6 @@ module.exports = function(app) {
                 res.send({ "message" : "error in deletion of user!" });
             } else {
                 res.send(user);
-                res.status(204);
             };
         });
     });

@@ -2,25 +2,26 @@ module.exports = function(app) {
 
     var path    = require("path");
 
-    app.get('/api/getRoute', function(req, res) {
-        res.send("In routes js file");
-        console.log("routes js file");
-    });
-
     app.get('/api/getLoggedInUser', function(req, res) {
+
         res.status(200).send(req.session.loggedInUser);
+
     });
 
     app.get('/api/logout', function(req, res) {
+
         req.session.destroy();
+
         if(!req.session) {
             res.send({ "message" : "logged out" });
         } else {
             res.send({ "message" : "still logged in" });
-        }
+        };
+
     });
 
     app.put('/api/setHighlightedPatient', function(req, res) {
+
         // EDIT THIS, PLEASE!
         req.session.highlightedPatient = {
 
@@ -42,12 +43,13 @@ module.exports = function(app) {
 
         console.log(req.session.highlightedPatient);
 
-        res.send("Successfully highlighted " + req.session.highlightedPatient);
+        res.send({ "message" : req.session.highlightedPatient });
     });
 
     app.get('/api/getHighlightedPatient', function(req, res) {
-        console.log("hp: "+ req.session.highlightedPatient.sex);
+
         res.status(200).send(req.session.highlightedPatient);
+    
     });
 
 };

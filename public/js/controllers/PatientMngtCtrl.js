@@ -19,6 +19,7 @@ var app = angular.module("PatientMngtCtrl", [])
         
 
         $scope.patient = {};
+        $scope.user = {};
 
         // global variables
         $scope.allAbstractsForPatient       = [];
@@ -137,6 +138,11 @@ var app = angular.module("PatientMngtCtrl", [])
         };
 
         $scope.initializeData = function() {
+
+            Users.getLoggedInUser().then(function(result) {
+                $scope.user = result;
+            });
+
             Patients.getHighlightedPatient().then(function(result) {
                 $scope.patient = result;
                 updateNecessaryData();
@@ -427,7 +433,6 @@ var app = angular.module("PatientMngtCtrl", [])
         
         // extra functions
         $scope.fixDate = function(object) {
-            console.log("to the fucn: "+ object.dateIssued);
             var newDate = new Date(object.dateIssued);
             object.fixedDate = newDate.getUTCMonth()+1 + "/" + newDate.getUTCDate() + "/" + newDate.getUTCFullYear();
         };
@@ -487,6 +492,7 @@ var app = angular.module("PatientMngtCtrl", [])
 
         $scope.requestFormObjectChange = function() {
             $scope.requestFormObject.words = $scope.requestFormObject.static;
+
             for(var change = 0 ; change<$scope.requestFormObject.arrRequests.length ; change+=1) {
                 $scope.requestFormObject.words = $scope.requestFormObject.words + "\n" + $scope.requestFormObject.arrRequests[change] + "\n";
             };
@@ -499,7 +505,7 @@ var app = angular.module("PatientMngtCtrl", [])
                 style       : 'content'
             };
 
-            pdfMake.createPdf(formatter(object)).download("request.pdf");
+            pdfMake.createPdf($scope.formatting(object)).download("request.pdf");
         };
 
 
@@ -529,7 +535,6 @@ var app = angular.module("PatientMngtCtrl", [])
             var strEnumeratedDiagnoses = strEnumerationOfDiagnoses;
 
             for(var i = 0 ; i < $scope.referralFormObject.arrDiagnosesToInclude.length ; i += 1) {
-                console.log($scope.referralFormObject.arrDiagnosesToInclude[i].name);
                 strEnumeratedDiagnoses = strEnumeratedDiagnoses + $scope.referralFormObject.arrDiagnosesToInclude[i].name + "\n";
             };
 
@@ -538,7 +543,7 @@ var app = angular.module("PatientMngtCtrl", [])
             var strAdditionalNotes = "\n" + $scope.referralFormObject.additionalNotes + "\n";
 
             // respectfully yours
-            var strEndWords = "\n\nRespectfully, \nDr. Dioquino";
+            var strEndWords = "\n\nRespectfully, \nDr. " + $scope.user.lastName;
 
             $scope.referralFormObject.words = $scope.referralFormObject.words + strEnumeratedDiagnoses + strAdditionalNotes + strEndWords;
         };
@@ -561,7 +566,7 @@ var app = angular.module("PatientMngtCtrl", [])
                 style   : 'content'
             };
 
-            pdfMake.createPdf(formatter(object)).download("referral.pdf");
+            pdfMake.createPdf($scope.formatting(object)).download("referral.pdf");
 
         };
 
@@ -604,7 +609,7 @@ var app = angular.module("PatientMngtCtrl", [])
                 style       : 'content'
             };
 
-            pdfMake.createPdf(formatter(object)).download("certificate.pdf");
+            pdfMake.createPdf($scope.formatting(object)).download("certificate.pdf");
         };
 
 
@@ -630,25 +635,24 @@ var app = angular.module("PatientMngtCtrl", [])
                         {
                             text    : consultation.fixedDate,
                             width   : "*",
-                            style   : 'patientInfoDateIssued'
+                            style   : 'content'
                         }, 
                         {
                             stack   : arrDiagnoses,
                             width   : "*",
-                            style   : 'diseaseNameInfo'
+                            style   : 'content'
                         }
                     ]
                 };
 
                 content.push(object);
-                console.log("im still moving");
             });
 
             var anotherObject = {
                 stack       : content
             }; 
 
-            pdfMake.createPdf(formatter(anotherObject)).download("patientinformation.pdf");
+            pdfMake.createPdf($scope.formatting(anotherObject)).download("patientinformation.pdf");
 
         };
 
@@ -656,10 +660,10 @@ var app = angular.module("PatientMngtCtrl", [])
 
             var object = {
                 text    : $scope.abstract.content,
-                style   : 'abstractContent'
+                style   : 'content'
             };
 
-            pdfMake.createPdf(formatter(object)).download('abstract.pdf');
+            pdfMake.createPdf($scope.formatting(object)).download('abstract.pdf');
         };
 
 
@@ -676,19 +680,19 @@ var app = angular.module("PatientMngtCtrl", [])
                     {
                         text    : prescription.genericName,
                         width   : 120,
-                        style   : 'prescriptionMedicine'
+                        style   : 'content'
                     },
                     // medicine quantity
                     {
                         text    : prescription.quantity,
                         width   : 60,
-                        style   : 'prescriptionQuantity'
+                        style   : 'content'
                     },
                     // medicine instructions
                     {
                         text    : prescription.instruction,
                         width   : "*",
-                        style   : 'prescriptionInstruction'
+                        style   : 'content'
                     }
                 ]
             };
@@ -701,345 +705,176 @@ var app = angular.module("PatientMngtCtrl", [])
                 stack       : content
             }; 
 
-            pdfMake.createPdf(formatter(anotherObject)).download("prescription.pdf");
+            pdfMake.createPdf($scope.formatting(anotherObject)).download("prescription.pdf");
 
         };
 
-        var formatter = function(words) {
 
-            // dynamic patient data
-            var patientName = $scope.patient.firstName + " " + $scope.patient.middleName + " " + $scope.patient.lastName;
-            var dateToday = $scope.fixDateWithNamedMonth(new Date());
-            var patientAddress = $scope.patient.address;
-            var age = $scope.fixAge($scope.patient.birthdate);
-            var sex = $scope.patient.sex;
+    /**
+     * TRIALS
+     */
 
-            var format = {
+    $scope.formatting = function(object) {
 
-    pageSize        : 'A5',
-	content: [ {
-	        text    : 'Dr. Carissa Paz C. Dioquino, M.D.',
-	        style   : 'header'
-	    }, {
-	        stack   : ['Neurologist - Toxicologist', 'Fellow, Philippine Neurologist Association'],
-	        style   : 'subHeader'
-	    }, {
-	        columns : [ {
-	        	stack   : [{
-	                        text    : 'Rm. 201 Mirasol Building'
-	                        }, {
-	                            text    : 'Apacible St. Cor. Taft Avenue, Manila'
-	                        }, {
-	                            stack   : [
-	                                    'Fri: 4:00 pm - 7:00 pm',
-	                                    'Sat: 10:00 am - 12:00 nn',
-	                                ]
-	                        },{
-	                            text    : 'Tel No. 782-6062'
-	                        }
-	                    ],
-	                style   : 'address'
-	            }, {
-	                stack   : [ {
-	                            text    : 'Rm. 509 Medical Arts Center'
-	                        }, {
-	                            text    : "Manila Doctor's Hospital T.M. Kalaw St."
-	                        }, {
-	                            stack   : [
-	                                    'Mon/Thurs: 5:00 pm - 7:00 pm'
-	                                ]
-	                        },
-	                        
-	                        // teleohone number of office
-	                        {
-	                            text    : 'Tel No. 558-0888 Loc.4410'
-	                        }
-	                    ],
-	                style   : 'address'
-	            },
-	            
-	            // address 3
-	            {
-	                stack   : [
-	                        // main room number
-	                        {
-	                            text    : 'Rm. 1117 North Tower'
-	                        },
-	                        
-	                        // real address of the office/clinic
-	                        {
-	                            text    : "Cathedral Heights Bldg. St. Luke's Medical Center"
-	                        },
-	                        
-	                        // time slots
-	                        {
-	                            stack   : [
-	                                    'Tues: 10:00 am - 12:00 nn'
-	                                ]
-	                        },
-	                        
-	                        // teleohone number of office
-	                        {
-	                            text    : 'Tel No. 725-8486'
-	                        }
-	                    ],
-	                style   : 'address'
-	            },
-	            
-	       ],
-	       
-	       margin   : [0, 0, 0, 0]
-	    },
-	    
-	    // 'ALL CLINICS BY APPOINTMENT'
-	    {
-	        text        : '\nALL CLINICS BY APPOINTMENT',
-	        bold        : true,
-	        fontSize    : 12,
-	        alignment   : 'center'
-	    },
-	    
-	    // patient info
-	    {
-	        stack       : [
-	            
-	            // 1st line - name and date
-	            {
-	                columns : [
-	                    
-	                        // name
-	                        {
-	                            text    : [
-	                            {
-	                                text    : 'Patient Name: ',
-	                                style   : 'infoMarker'
-	                            },
-	                            {   text    : patientName,
-	                                style   : 'patientInfo'
-	                            }
-	                            ],
-	                            
-	                            width   : '*',
-	                        },
-	                        
-	                        // date
-	                        {
-	                            text    : [
-	                            {
-	                                text    : 'Date: ',
-	                                style   : 'infoMarker'
-	                            },
-	                            {
-	                                text    : dateToday,
-	                                style   : 'patientInfo'
-	                            }
-	                            ],
-	                            
-	                            width   : '*'
-	                        }
-	                    ]      
-	            },
-	            
-	            // 2nd line - address, age, sex
-	            {
-	                columns : [
-	                        
-	                        // address
-	                        {
-	                            text    : [
-	                                {
-	                                    text    : 'Address: ',
-	                                    style   : 'infoMarker'
-	                                },
-	                                {
-	                                    text    : patientAddress,
-	                                    style   : 'patientInfo'
-	                                }
-	                            ],
-	                            
-	                            width   : '*'
-	                        },
-	                        
-	                        // age and sex
-	                        {
-	                            columns : [
-	                                
-	                                // age
-	                                {
-	                                    text    : [
-	                                    
-	                                    {
-	                                        text    : 'Age: ',
-	                                        style   : 'infoMarker'
-	                                    },
-	                                    
-	                                    {
-	                                        text    : age,
-	                                        style   : 'patientInfo'
-	                                    }
-	                                    ],
-	                                    
-	                                    width   : '*'
-	                                },
-	                                
-	                                // sex
-	                                {
-	                                    
-	                                    text   : [
-	                                     
-	                                    {
-	                                        text    : 'Sex: ',
-	                                        style   : 'infoMarker'
-	                                    },
-	                                   
-	                                    {
-	                                        text    : sex,
-	                                        style   : 'patientInfo'
-	                                    }
-	                                        
-	                                    ],
-	                                    
-	                                    width   : '*'
-	                                }
-	                                
-	                            ],
-	                            
-	                            width   : '*'
-	                        }
-	                        
-	                    ]
-	            }
-	        ]
-	    },
+        // doctor information
+        var strDoctorName = $scope.user.firstName + " " + $scope.user.middleName[0].toUpperCase() + ". " + $scope.user.lastName + ", M.D.";
+        var strDoctorLicenseNo = "Lic No " + $scope.user.license;
+        var strDoctorPTR = " PTR " + $scope.user.ptr;
 
-        {
-            text    : [
-                '\n',
-                '\n',
-                '\n'
-            ]
-        },
-	    
-	    // EVERY DYNAMIC CONTENT GOES HERE!!!!
-        {
-            stack   : [] // an ARRAY
-        }
-	    
-	],
-	
-	// footer
-	footer  : {
-	  
-	  columns   : [
-	      
-	    {
-	        
-	    },
-	    
-	    // doctor licnese and info
-	    {
-	        stack   : [
-	            
-	            // doctor name
-	            {
-	                text    : 'Carissa Paz C.Dioquino, MD',
-	                style   : 'footer'
-	            },
-	            
-	            // licenses and ptr
-	            {
-	                text    : [
-	                    'Lic No ',
-	                    
-	                    {   text  : '69908',
-	                        style : 'footer'
-	                    }, // license
-	                    
-	                    ' PTR ',
-	                    
-	                    {   text  : '6043889',
-	                        style : 'footer'
-	                    } // ptr
-	                ]
-	            }
-	        ]
-	    }
-	  
-	  ]  
-	    
-	},
-	
-	styles          : {
-	    
-	    header      : {
-	        fontSize    : 18,
-	        alignment   : 'center',
-	        bold        : true
-	    },
-	    
-	    footer      : {
-	        fontSize    : 11,
-	        alignment   : 'left'
-	    },
-	    
-	    subHeader   : {
-	        fontSize    : 11,
-	        alignment  : 'center'
-	    },
-	    
-	    address     : {
-	        fontSize    : 8,
-	        width       : '*'
-	    },
-	    
-	    patientInfo : {
-	        fontSize    : 11
-	    },
-	    
-	    infoMarker  : {
-	        bold        : true,
-	        fontSize    : 11
-	    },
+        // patient information
+        var strPatientName = $scope.patient.firstName + " " + $scope.patient.middleName + " " + $scope.patient.lastName;     
+        var strPatientAddress = $scope.patient.address;
+        var strPatientAge = $scope.fixAge($scope.patient.birthdate);
+        var strPatientSex = $scope.patient.sex;
 
-        prescriptionMedicine    : {
-            fontSize            : 11,
-            width               : 40
-        },
+        // date today
+        var strDateToday = $scope.fixDateWithNamedMonth(new Date());
 
-        prescriptionQuantity    : {
-            fontSize            : 11,
-            width               : 40
-        },
+        // addresses processing
+        var arrFinalAddresses = [];
 
-        prescriptionInstruction : {
-            fontSize            : 11,
-            width               : '*'
-        },
+        angular.forEach($scope.user.addresses, function(address) {
+            
+            var arrFullAddress = [];
 
-        abstractContent         : {
-            fontSize            : 11,
-            alignment           : 'left'
-        },
+            var objRoomNumber = {
+                text: address.roomNumber,
+                style: 'roomNumber'
+            };
 
-		content					: {
-			fontSize			: 11
-		},
+            var objMainAddress = {
+                text: address.mainAddress,
+                style: 'mainAddress'
+            };
 
-        patientInfoDateIssued   : {
-            fontSize            : 11
-        },
+            var objContactNumber = {
+                text: "Tel No: " + address.contactNumber,
+                style: 'contactNumber'
+            };
 
-        diseaseNameInfo         : {
-            fontSize            : 11
-        }
-	}
-};
+            // timeslots schedules processing
+            var arrTimeSlots = [];
+            var objFinalSlots = {
+                stack : []
+            };
 
-        format.content[6].stack.push(words);
-        
-        return format;
+            angular.forEach(address.timeSlots, function(timeslot) {
+                var objTimeSlot = {
+                    text: timeslot,
+                    style: 'timeSlot'
+                };
 
+                arrTimeSlots.push(objTimeSlot);
+            });
+
+            objFinalSlots.stack = arrTimeSlots.slice();
+
+            arrFullAddress.push(objRoomNumber);
+            arrFullAddress.push(objMainAddress);
+            arrFullAddress.push(objFinalSlots);
+            arrFullAddress.push(objContactNumber);
+
+            var objFinalAddress = {
+                stack : arrFullAddress.slice()
+            };
+
+            arrFinalAddresses.push(objFinalAddress);
+
+        });
+
+        var dd = {
+
+            pageSize: 'A5',
+            pageMargins: [30, 200, 30, 40],
+
+            header: [
+                { text: strDoctorName, style: 'doctorName' },
+                { columns: arrFinalAddresses, margin: [20, 0, 20, 0] },
+
+                { text: '\nALL CLINICS BY APPOINTMENT', bold: true, fontSize: 12, alignment: 'center' },
+
+                // patient information
+                { columns: [
+                    {
+                        stack: [
+                            { text: [ { text: 'Patient: ', bold: true }, strPatientName ], style: 'patientInformation' },
+                            { text: [ { text: 'Address: ', bold: true }, strPatientAddress ], style: 'patientInformation' }
+                        ]
+                    },
+                    {
+                        stack: [
+                            { text: [ { text: 'Date: ', bold: true }, strDateToday ], style: 'patientInformation' },
+
+                            { columns: [
+                                { text: [ { text: 'Age: ', bold: true }, strPatientAge ], style: 'patientInformation' },
+                                { text: [ { text: 'Sex: ', bold: true }, strPatientSex ], style: 'patientInformation' }
+                            ] }
+                        ]
+                    }
+                ], margin: [20, 0, 20, 0] } // end patient information
+
+             ],
+
+            content: [
+                
+                object
+
+            ],
+
+            footer: {
+                columns: [
+                    {   }, //empty column
+                    {
+                        stack: [{ text: strDoctorName }, { text: [strDoctorLicenseNo, strDoctorPTR] }]
+                    }
+                ]
+            },
+
+
+            styles: {
+
+                roomNumber: {
+                    fontSize: 9,
+                    bold: true
+                },
+
+                mainAddress: {
+                    fontSize: 9
+                },
+
+                timeSlot: {
+                    fontSize: 9
+                },
+
+                contactNumber: {
+                    fontSize: 9
+                },
+
+                patientInformation: {
+                    fontSize: 11
+                },
+
+                doctorName: {
+                    fontSize: 18,
+                    alignment: 'center',
+                    margin: [0, 15, 0, 0],
+                    bold: true
+                },
+
+                content: {
+                    fontSize: 12
+                }
+
+            }
         };
+
+        //pdfMake.createPdf(dd).download("yes.pdf");
+
+        return dd;
+
+    };
+
+
 
     });
 

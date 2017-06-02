@@ -3,22 +3,6 @@ module.exports = function(app) {
     var objectId        = require('mongodb').ObjectID;
     var Disease         = require('../models/disease.model')
 
-    var _saveCSV = function(arr) {
-        
-        var json2csv = require('json2csv');
-        var fs = require('fs');
-
-        var fields = ['_id', 'name', 'description'];
-
-        var csv = json2csv({ data: arr, fields: fields });
-
-        fs.writeFile('diseases.csv', csv, function(err) {
-        if (err) throw err;
-            console.log('file saved');
-        });
-
-    };
-
     app.get('/api/getAllDiseases', function(req, res) {
 
         Disease.find({})
@@ -30,9 +14,8 @@ module.exports = function(app) {
                     res.send(err);
                 } else {
                     if(diseases.size == 0) {
-                        res.send("No entries yet");
+                        res.send({ "message" : "No entries yet" });
                     } else {
-                        //_saveCSV(diseases);
                         res.status(200).send(diseases);
                     };
                 };
@@ -61,10 +44,6 @@ module.exports = function(app) {
 
     });
 
-    app.get('/api/getDiseaseWithName/:diseaseName', function(req, res) {
-
-    });
-
     app.post('/api/addDisease', function(req, res) {
 
         var newDisease          = new Disease();
@@ -73,10 +52,10 @@ module.exports = function(app) {
 
         newDisease.save(function(err, disease) {
             if(err) {
-                res.send("Error in saving new patient!");
+                res.send({ "message" : "Error in saving new patient!" });
             } else {
                 if(!disease._id) {
-                    res.send("Error in creating a new patient");
+                    res.send({ "message" : "Error in creating a new patient" });
                 } else {
                     res.send(disease);
                 };
@@ -99,9 +78,8 @@ module.exports = function(app) {
                 },
         function(err, disease) {
             if(err) {
-                res.send(err);
+                res.send({ "message" : err });
             } else {
-                console.log(disease);
                 res.send(disease);
             };
         });
@@ -116,10 +94,9 @@ module.exports = function(app) {
             _id : objectId(strDiseaseIDToDelete)
         }, function(err, disease) {
             if(err) {
-                res.send("Error in deletion");
+                res.send({ "message" : "Error in deletion" });
             } else {
                 res.send(disease);
-                res.status(204);
             };
         });
 
