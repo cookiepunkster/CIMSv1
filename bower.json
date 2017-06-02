@@ -1,0 +1,11 @@
+{
+    "name"      : "CIMS",
+
+    "dependencies": {
+        "bootstrap"     : "~3",
+        "angular"       : "~1.2",
+        "angular-route" : "*",
+        "jquery"        : "*",
+        "pdfMake"       : "*"
+    }
+}

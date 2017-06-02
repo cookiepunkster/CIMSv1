@@ -3,22 +3,6 @@ module.exports = function(app) {
     var objectId        = require('mongodb').ObjectID;
     var Prescription    = require('../models/prescription.model');
 
-    var _saveCSV = function(arr) {
-        
-        var json2csv = require('json2csv');
-        var fs = require('fs');
-
-        var fields = ['_id', 'patientID', 'dateIssued', 'diagnoses'];
-
-        var csv = json2csv({ data: arr, fields: fields });
-
-        fs.writeFile('prescriptions.csv', csv, function(err) {
-        if (err) throw err;
-            console.log('file saved');
-        });
-
-    };
-
     app.get('/api/getAllPrescriptionsForPatient/:patientID', function(req, res) {
 
         var strPatientID = req.params.patientID;
@@ -26,6 +10,9 @@ module.exports = function(app) {
         Prescription.find({
             patientID   : objectId(strPatientID)
         })
+        .sort({
+                dateIssued : 'descending'
+            })
         .exec(function(err, prescriptions) {
             if(err) {
                 res.send(err);
@@ -33,7 +20,6 @@ module.exports = function(app) {
                 if(prescriptions.length == 0) {
                     res.send({ "message" : "no prescriptions found for this patient" });
                 } else {
-                    console.log("Prescriptions found.");
                     res.send(prescriptions);
                 };
             };
@@ -56,7 +42,6 @@ module.exports = function(app) {
                     res.send({ "message" : "prescription not found" });
                     res.status(404);
                 } else {
-                    console.log("prescription found");
                     res.send(prescription);
                 };
             };
@@ -79,7 +64,7 @@ module.exports = function(app) {
 
         newPrescription.save(function(err, prescription) {
             if(err) {
-                res.send("Error in saving new patient!");
+                res.send({ "message" : err });
             } else {
                 if(!prescription._id) {
                     res.send({ "message" : "error in creating a new patient" });
@@ -120,7 +105,6 @@ module.exports = function(app) {
             if(err) {
                 res.send(err);
             } else {
-                console.log(prescription);
                 res.send({ "message" : "successfully updated prescription" });
             };
         });
@@ -139,7 +123,6 @@ module.exports = function(app) {
                 res.send({ "message" : err });
             } else {
                 res.send({ "message" : "successfully deleted prescription" });
-                res.status(204);
             };
         });
 

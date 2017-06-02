@@ -3,22 +3,6 @@ module.exports = function(app) {
     var objectId            = require('mongodb').ObjectID;
     var Consultation        = require('../models/consultation.model');
 
-    var _saveCSV = function(arr) {
-        
-        var json2csv = require('json2csv');
-        var fs = require('fs');
-
-        var fields = ['_id', 'patientID', 'dateIssued', 'diagnoses'];
-
-        var csv = json2csv({ data: arr, fields: fields });
-
-        fs.writeFile('consultations.csv', csv, function(err) {
-        if (err) throw err;
-            console.log('file saved');
-        });
-
-    };
-
     app.get('/api/getConsultation/:consultationID', function(req, res) {
 
         Consultation.findOne({
@@ -50,7 +34,6 @@ module.exports = function(app) {
                     if(consultations.length == 0) {
                         res.send({ "message" : "no consultations in the db yet" });
                     } else {
-                        _saveCSV(consultations);
                         res.send(consultations);
                     };
                 };
@@ -64,6 +47,9 @@ module.exports = function(app) {
         Consultation.find({
             patientID   : objectId(strPatientID)
         })
+            .sort({
+                dateIssued : 'descending'
+            })
             .exec(function(err, consultations) {
                 if(err) {
                     res.send(err);
@@ -71,7 +57,6 @@ module.exports = function(app) {
                     if(consultations.length == 0) {
                         res.send({ "message" : "no consultations for this patient yet" });
                     } else {
-                        //_saveCSV(consultations);
                         res.send(consultations);
                     };
                 };

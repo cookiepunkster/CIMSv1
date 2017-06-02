@@ -10,6 +10,7 @@ angular.module("PatientSearchCtrl", [])
          $scope.allPatients = [];
          $scope.patient = {};
 
+         // checker for the save function whether the user intends to save or update
          $scope.bIsUpdating = false;
 
          $scope.bNotAllPrivileges = true;
@@ -46,24 +47,32 @@ angular.module("PatientSearchCtrl", [])
                 // if both are selected
             };
 
+            // for adding patient
             if(!$scope.bIsUpdating) {
+
                 Patients.createPatient($scope.patient).then(function() {
                     console.log("finished saving!");
                     $scope.initializeData();
                     $scope.resetPatient();
                 });
-            } else if($scope.bIsUpdating) {
+
+            // for updating patient
+        } else if($scope.bIsUpdating) {
+            
                 Patients.updatePatient($scope.patient._id, $scope.patient).then(function(result) {
                     console.log(result);
+
                     $scope.bIsUpdating = false;
+
                     $scope.initializeData();
                     $scope.resetPatient();
                 })
+
             };
          };
 
+         // patient deletion in database
          $scope.delete = function() {
-            console.log("deleting in database");
 
             Patients.deletePatient($scope.patient._id).then(function(result) {
                 console.log("finished deleting!");
@@ -72,13 +81,11 @@ angular.module("PatientSearchCtrl", [])
             });
          };
 
-         $scope.toggleAdd = function() {
-
-         };
-
+         // for updating, copy the entry to update first then trigger the boolean value
          $scope.toggleUpdate = function(patient) {
             
             $scope.patient = {
+
                 "_id"           : patient._id,
 
                 "firstName"     : patient.firstName,
@@ -93,24 +100,31 @@ angular.module("PatientSearchCtrl", [])
                 // necessary for this controller
                 "sex.F"         : false,
                 "sex.M"         : false
+
             };
 
             if($scope.patient.sex === "F") {
+
                 $scope.patient.sex = {};
                 $scope.patient.sex.F = true;
+
             } else if($scope.patient.sex === "M") {
+
                 $scope.patient.sex = {};
                 $scope.patient.sex.M = true;
-            }
+
+            };
 
             $scope.bIsUpdating = true;
 
          };
 
+         // in deletion, copy the id of the entry to delete first
          $scope.toggleDelete = function(patient) {
             $scope.patient._id = patient._id;
          };
 
+         // data resetting
          $scope.resetPatient = function() {
              
             $scope.patient = {
@@ -121,7 +135,6 @@ angular.module("PatientSearchCtrl", [])
                 "lastName"      : "",
 
                 "birthdate"     : "",
-                //"sex"           : "",
                 "address"       : "",
                 "contactNumber" : "",
 
@@ -152,26 +165,25 @@ angular.module("PatientSearchCtrl", [])
 
                 patient.lastDiagnosis = result;
 
+                // when the result has no message attached
                 if(!result.message) {
-            
-                patient.lastDiagnosis.arrDiagnoses = [];
 
-                angular.forEach(patient.lastDiagnosis.diagnoses, function(diagnosis) {
-                    Diseases.getDisease(diagnosis).then(function(result) {
-                        patient.lastDiagnosis.arrDiagnoses.push(result);
+                    patient.lastDiagnosis.arrDiagnoses = [];
+
+                    // get the diagnoses array with it
+                    angular.forEach(patient.lastDiagnosis.diagnoses, function(diagnosis) {
+                        Diseases.getDisease(diagnosis).then(function(result) {
+                            patient.lastDiagnosis.arrDiagnoses.push(result);
+                        });
                     });
-                });
 
-                }
-            
+                };
             });
          };
-
 
          // navigator
          $scope.pathToNavigator = function() {
             $location.path('/navigator');
          };
-        
 
     });

@@ -3,22 +3,6 @@ module.exports = function(app) {
     var objectId    = require('mongodb').ObjectID;
     var Medicine    = require('../models/medicine.model');
 
-    var _saveCSV = function(arr) {
-        
-        var json2csv = require('json2csv');
-        var fs = require('fs');
-
-        var fields = ['_id', 'genericName', 'brandName', 'dose'];
-
-        var csv = json2csv({ data: arr, fields: fields });
-
-        fs.writeFile('medicines.csv', csv, function(err) {
-        if (err) throw err;
-            console.log('file saved');
-        });
-
-    };
-
     app.get('/api/saveAllMedicines', function(req, res) {
 
         Medicine.find({})
@@ -27,7 +11,7 @@ module.exports = function(app) {
             })
             .exec(function(err, medicines) {
                 if(err) {
-                    res.send(err);
+                    res.send({ "message" : err });
                 } else {   
                     res.json(medicines);
                 };
@@ -43,9 +27,8 @@ module.exports = function(app) {
             })
             .exec(function(err, medicines) {
                 if(err) {
-                    res.send(err);
+                    res.send({ "message" : err});
                 } else {
-                    _saveCSV(medicines);
                     res.json(medicines);
                 };
             });
@@ -71,10 +54,6 @@ module.exports = function(app) {
 
     });
 
-    app.get('/api/getMedicineWithName/:medicineName', function(req, res) {
-
-    });
-
     app.post('/api/addMedicine', function(req, res) {
 
         var newMedicine             = new Medicine();
@@ -84,7 +63,7 @@ module.exports = function(app) {
         
         newMedicine.save(function(err, medicine) {
             if(err) {
-                res.send("Error in saving new medicine!");
+                res.send({ "message" : "Error in saving new medicine!" });
             } else {
                 res.send(medicine);
             };
@@ -109,10 +88,9 @@ module.exports = function(app) {
         },
         function(err, medicine) {
             if(err) {
-                res.send(err);
+                res.send({ "message" : err });
             } else {
-                console.log(medicine);
-                res.send("successfully updated medicine");
+                res.send({ "message" : "successfully updated medicine" });
             };
         });
 
@@ -126,9 +104,9 @@ module.exports = function(app) {
             _id : objectId(strMedicineIDToDelete)
         }, function(err, medicine) {
             if(err) {
-                res.send("Error in deletion");
+                res.send({ "message" : "Error in deletion" });
             } else {
-                res.send("successfully deleted!");
+                res.send({ "message" : "successfully deleted" });
             };
         });
 

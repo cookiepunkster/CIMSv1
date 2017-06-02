@@ -3,22 +3,6 @@ module.exports = function(app) {
     var objectId    = require('mongodb').ObjectID;
     var Patient     = require('../models/patient.model');
 
-    var _saveCSV = function(arr) {
-        
-        var json2csv = require('json2csv');
-        var fs = require('fs');
-
-        var fields = ['_id', 'firstName', 'middleName', 'lastName', 'birthdate', 'sex', 'address', 'contactNumber'];
-
-        var csv = json2csv({ data: arr, fields: fields });
-
-        fs.writeFile('patients.csv', csv, function(err) {
-        if (err) throw err;
-            console.log('file saved');
-        });
-
-    };
-
     app.get('/api/getAllPatients', function(req, res) {
 
         Patient.find({})
@@ -29,7 +13,6 @@ module.exports = function(app) {
                 if(err) {
                     res.send({ "message" : err });
                 } else {
-                    //_saveCSV(patients);
                     res.json(patients);
                 };
             });
@@ -55,15 +38,10 @@ module.exports = function(app) {
 
     });
 
-    app.get('/api/getPatientWithName/:patientName', function(req, res) {
-
-        
-
-    });
-
     app.post('/api/createPatient', function(req, res) {
         
         var newPatient              = new Patient();
+
         newPatient.firstName        = req.body.firstName;
         newPatient.middleName       = req.body.middleName;
         newPatient.lastName         = req.body.lastName;
@@ -90,6 +68,7 @@ module.exports = function(app) {
     app.put('/api/updatePatient/:patientID', function(req, res) {
 
         var updatedPatient = {
+
             "firstName"             : req.body.firstName,
             "middleName"            : req.body.middleName,
             "lastName"              : req.body.lastName,
@@ -101,7 +80,8 @@ module.exports = function(app) {
             "address"               : req.body.address,
 
             "contactNumber"         : req.body.contactNumber
-        }
+
+        };
 
         Patient.findOneAndUpdate({
             _id : objectId(req.params.patientID)
@@ -114,9 +94,8 @@ module.exports = function(app) {
                 },
         function(err, patient) {
             if(err) {
-                res.send(err);
+                res.send({ "message" : err });
             } else {
-                console.log(patient);
                 res.send({ "message" : "successfully updated patient" });
             };
         });
@@ -135,7 +114,6 @@ module.exports = function(app) {
                 res.send({ "message" : "error in deletion" });
             } else {
                 res.send(patient);
-                res.status(204);
             };
         });
 

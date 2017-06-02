@@ -8,6 +8,7 @@ angular.module("UserCtrl", [])
 
         $scope.text = "User Management";
 
+        // for nav bar purposes
         $scope.loggedInUser = {};
         $scope.loggedIn = false;
 
@@ -42,15 +43,16 @@ angular.module("UserCtrl", [])
         };
 
         $scope.initializeUser = function() {
+            
             Users.getLoggedInUser().then(function(result) {
-                if(result) {
+                if(result.username) {
                     $scope.loggedInUser = result;
                     $scope.loggedIn = true;
 
-                    console.log($scope.loggedInUser);
+                    console.log("from initializeUser: " + result.username);
 
                     $location.path('/navigator');
-                } 
+                };
             });
         };
 
@@ -61,20 +63,13 @@ angular.module("UserCtrl", [])
                 if(!result.username) {
 
                     $scope.bNoUser = true;
+
                 } else if(result.username) {
 
                     $scope.bNoUser = false;
-
-                    Users.getLoggedInUser().then(function(result) {
-
-                        $scope.loggedInUser = result;
-                        $scope.loggedIn = true;
-                        $location.path('/navigator')
-                    });
-                };
-                
+                    $scope.initializeUser();
+                }; 
             });
-
         };
 
         $scope._toggleUpdate = function() {
@@ -126,7 +121,7 @@ angular.module("UserCtrl", [])
         /**
          * necessary UI manipulations boolean usage
          */
-
+        
         $scope.togglePasswordError = function() {
 
             if(!$scope.bPasswordNotMatching) {
@@ -143,30 +138,26 @@ angular.module("UserCtrl", [])
             } else {
                 $scope.bErrorInSigningUp = false;
             };
-
         };
 
         $scope._deleteUser = function() {
-            console.log("trying to delete");
             
             Users.logout().then(function(result) {
                 Users.deleteUser($scope.loggedInUser._id).then(function(result) {
+
                     $scope.loggedInUser = {};
                     $scope.loggedIn = false;
+
                     document.location.href="/";
-                    console.log("done");
                 });
             });
-            
         };
 
         // address entry
-
         $scope.pushAddress = function() {
             $scope.address.timeSlots = $scope.arrTimeSlots.slice();
 
             // actual pushing
-            console.log($scope.address);
             $scope.arrAddresses.push($scope.address);
 
             $scope.address = {};
@@ -174,8 +165,6 @@ angular.module("UserCtrl", [])
         };
 
         $scope.spliceAddress = function(address) {
-            console.log(address);
-
             var index = $scope.arrAddresses.indexOf(address);
 
             if(index != -1)
@@ -213,11 +202,9 @@ angular.module("UserCtrl", [])
 
             } else if($scope.user.password1 != $scope.user.password2) {
                 $scope.bPasswordNotMatching = true;
-            }
+            };
 
             if(!$scope.bPasswordNotMatching) {
-                console.log("trying to save");
-
                 $scope.user.addresses = $scope.arrAddresses.slice();
 
                 if($scope.bIsSaving) {
@@ -233,10 +220,12 @@ angular.module("UserCtrl", [])
                     Users.updateUser($scope.user._id, $scope.user).then(function(result) {
 
                         $scope.bPasswordNotMatching = false;
+                        $scope.loggedInUser = result;
+
+                        $scope.initializeUser();
                         $window.location.reload();
                     });
-
-                    $scope.signIn({ "username" : $scope.user.username, "password" : $scope.user.username });
+                    
                 };
 
                 $scope._resetUser();
@@ -251,16 +240,19 @@ angular.module("UserCtrl", [])
             $scope.arrAddresses = [];
         };
 
-        // address entry necessary functions
-
-
         $scope.logout = function() {
+
             Users.logout().then(function(result) {
                 if(result.message === "logged out") {
+
                     $scope.loggedIn = false;
+
+                    $scope._resetUser();
+                    $scope._resetBools();
                     $scope.loggedInUser = {};
-                    console.log(result.message);
+
                     $location.path('/');
+
                 };
             });
         };
