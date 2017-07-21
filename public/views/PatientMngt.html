@@ -21,18 +21,6 @@
         
     </div>
 
-    <!-- links to further document generation -->
-    <!--
-    <div class="row">
-    <button type="button" class="btn btn-default btn-block pull-right" data-toggle="collapse" data-target="#formLinks">Generate forms</button>
-    <div class="collapse" id="formLinks">
-        <a data-toggle="modal" data-target="#generateRequestForm">Request Form</a> <br/>
-        <a data-toggle="modal" data-target="#generateReferralForm">Referral Form</a> <br/>
-        <a>Patient Information</a> <br/>
-    </div>
-    -->
-
-
 </div> <!-- end left side bar -->
 
 
@@ -47,6 +35,7 @@
         <h5>{{ fixDateWithNamedMonth(patient.birthdate) }} / {{ fixAge(patient.birthdate) }} Y.O.</h5>
         <h5>{{ patient.contactNumber }}</h5>
         <h5>{{ patient.address }}</h5>
+        <h5><a href="#!" data-toggle="modal" data-target="#showLabHistory"><i>Lab History</i></a></h5>
         <h5><a href="#!" ng-click="generatePatientInformation()"><i>Generate patient information</i></a></h5>
         <h5><a href="#!" data-toggle="modal" data-target="#generateRequestForm"><i>Generate request form</i></a></h5>
     </div> <!-- end demographics -->
@@ -147,7 +136,7 @@
 
                     <!-- generate -->
                     <div class="col-lg-2">
-                        <button class="btn btn-default btn-block" data-toggle="collapse" data-target="#setOfButtons">Generate</button>
+                        <button class="btn btn-default btn-block" data-toggle="collapse" data-target="#setOfButtons" ng-disabled="consultation.diagnosesWithData.length == 0">Generate</button>
                         
                         <br/>
                         <div class="collapse" id="setOfButtons">
@@ -286,7 +275,7 @@
                         <!-- quantity -->
                         <div class="col-lg-2">
                         <div class="form-group">
-                            <textarea class="form-control" placeholder="Quantity" rows="2" ng-model="object.quantity"></textarea>
+                            <input type="number" class="form-control" placeholder="Quantity" rows="2" ng-model="object.quantity"/>
                         </div>
                         </div>
 
@@ -325,7 +314,7 @@
 
                             <!-- generate -->
                             <div class="col-lg-2">
-                                <button class="btn btn-default btn-block" ng-click="generatePrescription()">Generate</button>
+                                <button class="btn btn-default btn-block" ng-click="generatePrescription()" ng-disabled="prescription.prescriptionPerMedicineWithData.length == 0">Generate</button>
                             </div>
                         
                         </div>
@@ -354,7 +343,7 @@
                 <td>
                     <ul>
                         <li ng-repeat="medicine in prescription.prescriptionPerMedicineWithData">
-                            {{ medicine.brandName }} | {{ medicine.quantity }} | {{ medicine.instruction }}
+                            {{ medicine.genericName }} | {{ medicine.quantity }} | {{ medicine.instruction }}
                         </li>
                     </ul>
                 </td>
@@ -431,12 +420,12 @@
 
                             <!-- save as new -->
                             <div class="col-lg-2">
-                                <button class="btn btn-default btn-block" data-toggle="collapse" data-target="#abstractFormProper" ng-click="save()">Save as new</button>
+                                <button class="btn btn-default btn-block" data-toggle="collapse" data-target="#abstractFormProper" ng-click="save()" ng-disabled="!abstract.content">Save as new</button>
                             </div>
 
                             <!-- generate -->
                             <div class="col-lg-2">
-                                <button class="btn btn-default btn-block" ng-click="generateAbstract()">Generate</button>
+                                <button class="btn btn-default btn-block" ng-click="generateAbstract()" ng-disabled="!abstract.content">Generate</button>
                             </div>
                         </div>
 
@@ -640,6 +629,52 @@
 <div class="modal-content">
     <div class="modal-header">
         <h4 class="modal-title">Certificate generator</h4>
+    </div>
+
+    <div class="modal-body">
+    <!-- textarea to show my current words -->
+    <div class="form-group">
+        <textarea class="form-control" rows="8" ng-model="certificateFormObject.words">
+
+        </textarea>
+    </div>
+
+    <!-- use input -->
+    <label for="use">Use: </label>
+    <div class="form-group">
+        <input type="text" class="form-control" id="use" ng-model="certificateFormObject.use" ng-bind="certificateFormObjectChange()"/>
+    </div>
+
+
+    <!-- menu of diagnoses to be included -->
+    <label>Diagnoses to include: </label>
+    <div class="form-group" ng-repeat="diagnosis in certificateFormObject.arrDiagnosesToInclude">
+    <div class="input-group">
+        <input type="text" class="form-control" disabled ng-model="diagnosis.name"/>
+        <div class="input-group-btn">
+            <button class="btn btn-default" ng-click="spliceInCertificateObject(diagnosis)">
+                Del
+            </button>
+        </div>
+    </div>
+    </div> 
+
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary btn-block" data-dismiss="modal" ng-disabled="!certificateFormObject.use || certificateFormObject.arrDiagnosesToInclude.length == 0" ng-click="generateCertificate()">Generate</button>
+    </div>
+</div>
+</div>
+</div>
+
+
+<!-- modal for lab history -->
+<div class="modal fade" id="showLabHistory">
+<div class="modal-dialog modal-lg">
+<div class="modal-content">
+    <div class="modal-header">
+        <h4 class="modal-title">Lab History</h4>
     </div>
 
     <div class="modal-body">

@@ -49,7 +49,8 @@ app.get('*', function(req, res) {
  */
 
 var mongoose        = require('mongoose');
-var db              = 'mongodb://jolly:jolly@ds161551.mlab.com:61551/meddata';
+//var db              = 'mongodb://jolly:jolly@ds161551.mlab.com:61551/meddata';
+var db              = "localhost:27017/medData";
 
 mongoose.connect(db);
 
@@ -65,7 +66,7 @@ mongoose.connection.on("open", function(ref) {
 
 // server start
 app.listen(port, function() {
-    console.log("Server is running at http://localhost:3000");
+    console.log("Server is running at http://localhost:8080");
 });
 
 // exporting my app as well

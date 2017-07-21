@@ -217,9 +217,10 @@ var app = angular.module("PatientMngtCtrl", [])
             
             var first = -1;
             var second = $scope.prescription.prescriptionPerMedicineWithData.indexOf(prescription);
-
+            
             angular.forEach($scope.prescription.prescriptionPerMedicine, function(medicine) {
-                if(medicine._id === prescription._id) {
+
+                if(medicine.medicine === prescription._id || medicine._id === prescription._id) {
                     
                     first = $scope.prescription.prescriptionPerMedicine.indexOf(medicine);
 
@@ -230,6 +231,7 @@ var app = angular.module("PatientMngtCtrl", [])
                     if(second != -1) {
                         $scope.prescription.prescriptionPerMedicineWithData.splice(second, 1);
                     }
+
                 };
             });
 
@@ -663,7 +665,7 @@ var app = angular.module("PatientMngtCtrl", [])
                 style   : 'content'
             };
 
-            pdfMake.createPdf($scope.formatting(object)).download('abstract.pdf');
+            pdfMake.createPdf($scope.formatAbstract(object)).download('abstract.pdf');
         };
 
 
@@ -674,6 +676,8 @@ var app = angular.module("PatientMngtCtrl", [])
 
             angular.forEach($scope.prescription.prescriptionPerMedicineWithData, function(prescription) {
             
+            var number = "#" + prescription.quantity;
+
             var object = {
                 columns : [
                     // medicine name
@@ -684,7 +688,7 @@ var app = angular.module("PatientMngtCtrl", [])
                     },
                     // medicine quantity
                     {
-                        text    : prescription.quantity,
+                        text    : number,
                         width   : 60,
                         style   : 'content'
                     },
@@ -713,6 +717,93 @@ var app = angular.module("PatientMngtCtrl", [])
     /**
      * TRIALS
      */
+
+    $scope.formatAbstract = function(object) {
+
+        var strPatientName = $scope.patient.firstName + " " + $scope.patient.middleName + " " + $scope.patient.lastName;     
+        var strDateToday = $scope.fixDateWithNamedMonth(new Date());
+
+        var dd = {
+
+            pageSize: 'A4',
+            pageMargins: [80, 150, 80, 80],
+
+            header: [
+                {
+                    text: "Carissa Paz C. Dioquino, MD, MPH",
+                    style: "doctorName"
+                },
+                {
+                    text: "Fellow, Philippine Neurological Association",
+                    style: "info"
+                },
+                {
+                    text: "Fellow, Philippine Society of Clinical and Occupational Toxicology",
+                    style: "info"
+                },
+                {
+                    text: "Rm 201 Mirasol Building",
+                    style: "info"
+                },
+                {
+                    text: "Apacible Street corner Taft Avenue, Manila",
+                    style: "info"
+                }
+            ], 
+
+            content: [
+
+                {
+                    text: "M E D I C A L  A B S T R A C T",
+                    style: "title"
+                },
+
+                {
+                    text: strPatientName,
+                    style: "title"
+                },
+
+                {
+                    text: strDateToday,
+                    style: "moreinfo"
+                },
+
+                {
+                    text: "\n\n"
+                },
+
+                object
+            ],
+
+            styles: {
+
+                doctorName: {
+                    fontSize: 18,
+                    alignment: 'center',
+                    margin: [0, 40, 0, 0],
+                    italics: true
+                },
+
+                info: {
+                    alignment: 'center'
+                },
+
+                title: {
+                    bold: true,
+                    alignment: 'center'
+                },
+
+                moreinfo: {
+                    alignment: 'center'
+                }
+
+            }
+
+        };
+
+        return dd;
+
+    };
 
     $scope.formatting = function(object) {
 
@@ -789,9 +880,16 @@ var app = angular.module("PatientMngtCtrl", [])
 
             header: [
                 { text: strDoctorName, style: 'doctorName' },
+                { stack: [ {
+                    text: "Neurologist - Toxicologist",
+                    style: 'label'
+                }, {
+                    text: "Fellow, Philippine Neurological Association",
+                    style: 'label'
+                } ] },
                 { columns: arrFinalAddresses, margin: [20, 0, 20, 0] },
 
-                { text: '\nALL CLINICS BY APPOINTMENT', bold: true, fontSize: 12, alignment: 'center' },
+                { text: '\nALL CLINICS BY APPOINTMENT\n', bold: true, fontSize: 12, alignment: 'center' },
 
                 // patient information
                 { columns: [
@@ -836,6 +934,11 @@ var app = angular.module("PatientMngtCtrl", [])
                 roomNumber: {
                     fontSize: 9,
                     bold: true
+                },
+
+                label: {
+                    fontSize: 10,
+                    alignment: 'center'
                 },
 
                 mainAddress: {
@@ -929,7 +1032,7 @@ var app = angular.module("PatientMngtCtrl", [])
         }
         
         var results = [];
-        //console.log(query.genericName.toLowerCase());
+
         query = query.toLowerCase();
 
         angular.forEach(arr, function(item) {

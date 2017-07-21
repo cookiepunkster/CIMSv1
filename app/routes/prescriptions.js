@@ -50,7 +50,7 @@ module.exports = function(app) {
     });
 
     app.post('/api/addPrescription', function(req, res) {
-
+        console.log(req.body);
         var newPrescription                                     = new Prescription();
         
         newPrescription.patientID                               = objectId(req.body.patientID);
@@ -64,10 +64,11 @@ module.exports = function(app) {
 
         newPrescription.save(function(err, prescription) {
             if(err) {
-                res.send({ "message" : err });
+                console.log(err);
+                res.send({ "error" : err });
             } else {
                 if(!prescription._id) {
-                    res.send({ "message" : "error in creating a new patient" });
+                    res.send({ "message" : "error in creating a new prescription" });
                 } else {
                     res.send(prescription);
                 };
